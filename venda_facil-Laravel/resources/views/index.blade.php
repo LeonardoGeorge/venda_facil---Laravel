@@ -10,9 +10,12 @@
     body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: #f4f4f4;
+  background: #000000;
 }
-
+a {
+    text-decoration: none;
+    color: inherit; /* Herda a cor do elemento pai */
+}
 .top-bar {
   background: #111;
   color: white;
@@ -50,6 +53,10 @@
   font-size: 16px;
 }
 
+.menu li a:hover {
+  color: #7ac943;
+}
+
 .auth-buttons {
   display: flex;
   gap: 10px;
@@ -72,6 +79,7 @@
 }
 
 .section-cards {
+  background: #000000;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
@@ -120,9 +128,9 @@
 .footer {
   text-align: center;
   padding: 15px;
-  background-color: #eee;
+  background-color: #000000;
   margin-top: 40px;
-  color: #555;
+  color: #8b8b8b;
 }
 
 
@@ -136,11 +144,12 @@
     <div class="logo"><a href="01.index.html">Venda<span>FACIL</span></a></div>
     <nav>
         <ul class="menu">
-            <li><a href="02.vendas.html">Vendas</a></li>
-            <li><a href="03.clientes.html">Clientes</a></li>
-            <li><a href="04.produtos.html">Produtos</a></li>
-            <li><a href="#">Estoque</a></li>
-            <li><a href="#">Mais</a></li>
+            <li><a href="http://localhost:8000/venda">Vendas</a></li>
+            <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
+            <li><a href="http://localhost:8000/cliente">Clientes</a></li>
+            <li><a href="http://localhost:8000/produtos">Produtos</a></li>
+            <li><a href="http://localhost:8000/finaceiro">Financeiro</a></li>
+            <li><a href="http://localhost:8000/estoque">Estoque</a></li>
         </ul>
     </nav>
     <div class="auth-buttons">
@@ -149,47 +158,52 @@
     </div>
 </header>
 <body>
-  <main class="section-cards">
-    <div class="card yellow">
-      <h2>Para suas vendas</h2>
-      <ul>
-        <li>✅ Frente de Caixa (PDV)</li>
-        <li>✅ Loja Virtual</li>
-        <li>✅ Pedidos</li>
-      </ul>
-      <button>Saiba mais</button>
-    </div>
-    <div class="card purple">
-      <h2>Para seu estoque</h2>
-      <ul>
-        <li>✅ Central de Compras</li>
-        <li>✅ Movimentações e Transferências</li>
-        <li>✅ Grade de Produtos</li>
-      </ul>
-      <button>Saiba mais</button>
-    </div>
-    <div class="card orange">
-      <h2>Para sua gestão</h2>
-      <ul>
-        <li>✅ Relatórios</li>
-        <li>✅ Dashboards</li>
-        <li>✅ Aplicativos Móveis</li>
-      </ul>
-      <button>Saiba mais</button>
-    </div>
-    <div class="card blue">
-      <h2>Para suas finanças</h2>
-      <ul>
-        <li>✅ Notas Fiscais</li>
-        <li>✅ Meios de Pagamentos</li>
-        <li>✅ Fluxo de Caixa</li>
-      </ul>
-      <button>Saiba mais</button>
-    </div>
-  </main>
+ <main class="section-cards">
+  <div class="card yellow">
+    <h1>CADASTROS</h1>
+    <ul>
+      <li>✅ Cadastro de clientes</li>
+      <li>✅ Cadastro de produtos</li>
+      <li>✅ Cadastro de fornecedores</li>
+    </ul>
+    <button><a href='http://localhost:8000/cadastro'>Comece a cadastrar</a></button>
+  </div>
+
+  <div class="card purple">
+    <h1>VENDAS</h1>
+    <ul>
+      <li>✅ Acesso à tela de venda</li>
+      <li>✅ 100% grátis</li>
+      <li>✅ 100% online</li>
+    </ul>
+    <button><a href="http://localhost:8000/venda">Comece a vender</a></button>
+  </div>
+
+  <div class="card orange">
+    <h1>CLIENTE</h1>
+    <ul>
+      <li>✅ Relatórios</li>
+      <li>✅ Informações</li>
+      <li>✅ Marketing</li>
+    </ul>
+    <button>Comece a divulgar</button>
+  </div>
+
+  <div class="card blue">
+    <h1>FINANÇAS</h1>
+    <ul>
+      <li>✅ Relatórios financeiros</li>
+      <li>✅ Meios de pagamento</li>
+      <li>✅ Fluxo de caixa</li>
+    </ul>
+    <button>Comece a se organizar</button>
+  </div>
+</main>
+
+  <footer class="footer">
+    <p>Criado por <strong>Leonardo George</strong> &copy; 2025</p>
+  </footer>
 </body>
 
-<footer class="footer">
-    <p>Criado por <strong>Leonardo George</strong> &copy; 2024</p>
-</footer>
+
 </html>
