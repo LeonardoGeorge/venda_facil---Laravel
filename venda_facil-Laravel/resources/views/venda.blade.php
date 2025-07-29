@@ -318,7 +318,7 @@ a {
                     <div class="total-pagamento">
                         <div class="valor-pago">
                             <label>Valor Pago</label>
-                            <input type="text" id="valorTotal" readonly>
+                            <input type="text" id="valorPago" readonly>
                         </div>
                         <div class="troco">
                             <label>Troco</label>
@@ -338,7 +338,7 @@ a {
             </section>
     </div>
 
-     <script>
+    <script>
         let contadorItem = 1;
         let totalVenda = 0;
         let totalItens = 0;
@@ -388,8 +388,8 @@ a {
         document.getElementById('valorUnitario').addEventListener('input', atualizarValorTotal);
     
         // Executar adicionarItem() ao apertar Enter em qualquer input
-['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', function (e) {
+        ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
+        document.getElementById(id).addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault(); // evita comportamento padrão
             adicionarItem();
@@ -397,8 +397,56 @@ a {
     });
 });
 
-    
-    </script>
+
+// Buscar produto ao digitar código
+document.getElementById('codigo').addEventListener('change', async function () {
+    const codigo = this.value;
+
+    if (!codigo) return;
+
+    try {
+        const response = await fetch(`/api/produtos/${codigo}`);
+        const produto = await response.json();
+
+        if (produto.erro) {
+            alert(produto.erro);
+            return;
+        }
+
+        document.getElementById('valorUnitario').value = formatarNumero(produto.preco_saida || 0);
+        atualizarValorTotal();
+
+    } catch (error) {
+        console.error('Erro ao buscar produto:', error);
+    }
+});
+
+// Buscar cliente ao digitar nome
+document.getElementById('cliente').addEventListener('blur', async function () {
+    const nome = this.value;
+
+    if (!nome) return;
+
+    try {
+        const response = await fetch(`/api/clientes/${nome}`);
+        const cliente = await response.json();
+
+        if (cliente.erro) {
+            alert(cliente.erro);
+            return;
+        }
+
+        // Aqui você pode usar os dados do cliente se quiser, por exemplo:
+        console.log('Cliente encontrado:', cliente);
+
+    } catch (error) {
+        console.error('Erro ao buscar cliente:', error);
+    }
+});
+</script>
+
+
+
     
 </body>
 

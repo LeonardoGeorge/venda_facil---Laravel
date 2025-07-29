@@ -31,4 +31,15 @@ class ClienteController extends Controller
 
         return redirect()->route('clientes.index')->with('success', 'Cliente cadastrado com sucesso!');
     }
+
+    public function buscarPorNome($nome)
+    {
+        $cliente = \App\Models\Cliente::where('nome', 'ilike', "%{$nome}%")->first();
+
+        if (!$cliente) {
+            return response()->json(['erro' => 'Cliente não encontrado'], 404);
+        }
+
+        return response()->json($cliente);
+    }
 }

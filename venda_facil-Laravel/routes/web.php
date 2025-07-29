@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\FornecedorController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,6 +20,12 @@ use App\Http\Controllers\FornecedorController;
 Route::get('/', function () {
     return view('index');
 });
+
+Route::get('/api/produtos/{codigo}', [ProdutoController::class, 'buscarPorCodigo']);
+Route::get('/api/clientes/{nome}', [ClienteController::class, 'buscarPorNome']);
+
+Route::get('/api/produtos/{codigo}', [ProdutoController::class, 'buscarPorCodigo']);
+Route::get('/api/clientes/{nome}', [ClienteController::class, 'buscarPorNome']);
 
 // CADASTROS SIMPLES (sem controller por enquanto)
 Route::view('/cadastro', 'cadastro');
