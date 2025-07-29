@@ -256,15 +256,15 @@ a {
 
 <body>
     <header class="top-bar">
-        <div class="logo"><a href="#">Venda<span>FACIL</span></a></div>
+        <div class="logo"><a href="http://localhost:8000/">Venda<span>FACIL</span></a></div>
         <nav>
             <ul class="menu">
                 <a href="http://localhost:8000/">Início</a>
                 <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-                <li><a href="#">Clientes</a></li>
-                <li><a href="#">Produtos</a></li>
-                <li><a href="#">Financeiro</a></li>
-                <li><a href="#">Estoque</a></li>
+                <li><a href="http://localhost:8000/clientes">Clientes</a></li>
+                <li><a href="http://localhost:8000/produtos">Produtos</a></li>
+                <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
+                <li><a href="http://localhost:8000/estoque">Estoque</a></li>
             </ul>
         </nav>
     </header>

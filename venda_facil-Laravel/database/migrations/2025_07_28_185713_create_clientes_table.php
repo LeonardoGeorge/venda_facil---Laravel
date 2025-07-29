@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nome', 255);
             $table->string('telefone', 20);
             $table->string('email', 255)->nullable();
-            $table->string('cpf', 14)->unique(); // Formatado: 000.000.000-00
+            $table->string('cpf', 14); // Formatado: 000.000.000-00
             $table->timestamps(); // Cria created_at e updated_at
         });
     }
@@ -27,4 +27,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('clientes');
     }
+    
 };

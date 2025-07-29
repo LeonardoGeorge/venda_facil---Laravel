@@ -142,6 +142,20 @@
     <main>
         <section>
             <h2>Dados do Produto</h2>
+            @if (session('success'))
+              <p style="color: green">{{ session('success') }}</p>
+            @endif
+
+            @if ($errors->any())
+                <div style="color: red">
+                  <ul>
+                    @foreach ($errors->all() as $erro)
+                      <li>{{ $erro }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('produtos.store') }}"> 
                 @csrf
                 <label>Nome do Produto:</label>

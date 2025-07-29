@@ -51,6 +51,9 @@ Route::get('/cadastro-clientes', function () {
 Route::get('/cadastro-fornecedor', function () {
     return view('cadastro-fornecedor');
 });
+Route::get('/cadastro-produtos', function () {
+    return view('cadastro-produtos');
+});
 
 
 // PRODUTOS
