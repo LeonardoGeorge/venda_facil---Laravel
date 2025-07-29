@@ -156,7 +156,21 @@
     <main>
         <section>
             <h2>Dados do Fornecedor</h2>
-            <form action="backend/cadastrar_fornecedor.php" method="POST">
+               @if (session('success'))
+              <p style="color: green">{{ session('success') }}</p>
+            @endif
+
+            @if ($errors->any())
+                <div style="color: red">
+                  <ul>
+                    @foreach ($errors->all() as $erro)
+                      <li>{{ $erro }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+            @endif
+            <form method="POST" action="{{ route('fornecedores.store') }}">
+                @csrf
                 <label>Nome/Razão Social:</label>
                 <input type="text" name="nome" required>
                 
