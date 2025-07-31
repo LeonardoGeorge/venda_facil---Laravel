@@ -318,7 +318,7 @@ a {
                     <div class="total-pagamento">
                         <div class="valor-pago">
                             <label>Valor Pago</label>
-                            <input type="text" id="valorPago" readonly>
+                            <input type="text" id="valorPago" placeholder="0,00">
                         </div>
                         <div class="troco">
                             <label>Troco</label>
@@ -342,6 +342,8 @@ a {
         let contadorItem = 1;
         let totalVenda = 0;
         let totalItens = 0;
+        let nomeProdutoAtual = '';
+
 
         function formatarNumero(valor) {
             return parseFloat(valor).toFixed(2).replace('.', ',');
@@ -369,7 +371,8 @@ a {
             totalItens += quantidade;
 
             const nota = document.getElementById('notaFiscal');
-            nota.innerHTML += `\n${String(contadorItem).padStart(3, '0')}   ${codigo.padEnd(10)} Produto Genérico     ${formatarNumero(valorUnitario).padStart(8)}   ${formatarNumero(valorTotal).padStart(8)}`;
+            nota.innerHTML += `\n${String(contadorItem).padStart(3, '0')}   ${codigo.padEnd(10)} ${nomeProdutoAtual.padEnd(20)} ${formatarNumero(valorUnitario).padStart(8)}   ${formatarNumero(valorTotal).padStart(8)}`;
+
 
             document.getElementById('volumes').value = totalItens.toFixed(0);
             document.getElementById('totalVenda').innerText = "R$ " + formatarNumero(totalVenda);
@@ -381,21 +384,36 @@ a {
             document.getElementById('quantidade').value = 1;
             document.getElementById('valorUnitario').value = '';
             document.getElementById('valorTotal').value = '';
+            nomeProdutoAtual = '';
         }
+        function calcularTroco() {
+            const totalVendaTexto = document.getElementById('totalVenda').innerText.replace('R$ ', '').replace(',', '.');
+            const valorPagoTexto = document.getElementById('valorPago').value.replace(',', '.');
+
+            const totalVenda = parseFloat(totalVendaTexto) || 0;
+            const valorPago = parseFloat(valorPagoTexto) || 0;
+
+            const troco = valorPago - totalVenda;
+
+            document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
+        }
+
+        document.getElementById('valorPago').addEventListener('input', calcularTroco);
 
         // Atualiza valor total em tempo real
         document.getElementById('quantidade').addEventListener('input', atualizarValorTotal);
         document.getElementById('valorUnitario').addEventListener('input', atualizarValorTotal);
     
         // Executar adicionarItem() ao apertar Enter em qualquer input
-        ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
-        document.getElementById(id).addEventListener('keydown', function (e) {
+      ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault(); // evita comportamento padrão
             adicionarItem();
         }
     });
 });
+
 
 
 // Buscar produto ao digitar código
@@ -416,10 +434,14 @@ document.getElementById('codigo').addEventListener('change', async function () {
         document.getElementById('valorUnitario').value = formatarNumero(produto.preco_saida || 0);
         atualizarValorTotal();
 
+        // ✅ Armazenar o nome do produto para mostrar na nota
+        nomeProdutoAtual = produto.nome_produto || 'Produto Desconhecido';
+
     } catch (error) {
         console.error('Erro ao buscar produto:', error);
     }
 });
+
 
 // Buscar cliente ao digitar nome
 document.getElementById('cliente').addEventListener('blur', async function () {
@@ -436,12 +458,16 @@ document.getElementById('cliente').addEventListener('blur', async function () {
             return;
         }
 
+
         // Aqui você pode usar os dados do cliente se quiser, por exemplo:
         console.log('Cliente encontrado:', cliente);
 
     } catch (error) {
         console.error('Erro ao buscar cliente:', error);
     }
+
+
+
 });
 </script>
 

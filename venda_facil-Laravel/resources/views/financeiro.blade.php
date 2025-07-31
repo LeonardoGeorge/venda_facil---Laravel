@@ -1,154 +1,204 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Vendas</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Financeiro - VendaFácil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #000;
+            color: white;
+        }
 
-<style>
-    body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: #000000;
-}
-a {
-    text-decoration: none;
-    color: inherit; /* Herda a cor do elemento pai */
-}
-.top-bar {
-  background: #111;
-  color: white;
-  padding: 15px 40px;
-  flex-wrap: wrap;
-  display: flex;
-  justify-content: space-between;
-}
+        .top-bar {
+            background: #111;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 40px;
+            flex-wrap: wrap;
+        }
 
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
-}
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-.logo span {
-  background: #7ac943;
-  color: #181818;
-  padding: 2px 6px;
-  border-radius: 3px;
-  margin-left: 4px;
-}
+        .logo span {
+            background: #7ac943;
+            color: #181818;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 4px;
+        }
 
-.menu {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  padding: 0;
-  margin: 0;
-}
+        .menu {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+        }
 
-.menu li a {
-  color: rgb(250, 234, 234);
-  text-decoration: none;
-  font-size: 16px;
-}
+        .menu li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
 
-.menu li a:hover {
-  color: #7ac943;
-}
+        .menu li a:hover {
+            color: #7ac943;
+        }
 
-.auth-buttons {
-  display: flex;
-  gap: 10px;
-}
+        .financeiro-container {
+            padding: 20px 40px;
+        }
 
-.btn-outline {
-  background: transparent;
-  color: white;
-  border: 1px solid white;
-  padding: 5px 15px;
-  cursor: pointer;
-}
+        h1 {
+            text-align: center;
+            color: #7ac943;
+        }
 
-.btn-solid {
-  background: #7ac943;
-  color: black;
-  border: none;
-  padding: 5px 15px;
-  cursor: pointer;
-}
+        .filtros {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-.section-cards {
-  background: #000000;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 40px;
-}
+        .filtros input,
+        .filtros select {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            min-width: 200px;
+        }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+        .filtros button {
+            background-color: #7ac943;
+            color: black;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-.card h2 {
-  margin-top: 0;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1c1c1c;
+            color: white;
+            border-radius: 6px;
+            overflow: hidden;
+        }
 
-.card ul {
-  list-style: none;
-  padding: 0;
-}
+        table th,
+        table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
 
-.card ul li {
-  margin: 10px 0;
-}
+        table th {
+            background-color: #333;
+            color: #7ac943;
+        }
 
-.card button {
-  background: white;
-  color: black;
-  border: none;
-  padding: 8px 12px;
-  margin-top: 10px;
-  cursor: pointer;
-  font-weight: bold;
-}
+        .resumo {
+            margin-top: 20px;
+            background: #111;
+            padding: 20px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+        }
 
-/* Cores dos blocos */
-.yellow { background: #f0c419; }
-.purple { background: #9b59b6; }
-.orange { background: #f39c12; }
-.blue   { background: #1abc9c; }
+        .resumo-item {
+            font-size: 18px;
+        }
 
+        .resumo-item span {
+            display: block;
+            font-size: 24px;
+            color: #7ac943;
+        }
 
-/* ===== FOOTER ===== */
-.footer {
-  text-align: center;
-  padding: 15px;
-  background-color: #000000;
-  margin-top: 40px;
-  color: #8b8b8b;
-}
-
-
-</style>
-
-
-
-
+    </style>
 </head>
+<body>
+
 <header class="top-bar">
-    <div class="logo"><a href="01.index.html">Venda<span>FACIL</span></a></div>
+    <div class="logo"><a href="http://localhost:8000/" style="color: white;">Venda<span>FACIL</span></a></div>
     <nav>
         <ul class="menu">
-            <li><a href="http://localhost:8000/venda">Vendas</a></li>
             <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-            <li><a href="http://localhost:8000/cliente">Clientes</a></li>
+            <li><a href="http://localhost:8000/clientes">Clientes</a></li>
             <li><a href="http://localhost:8000/produtos">Produtos</a></li>
             <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
             <li><a href="http://localhost:8000/estoque">Estoque</a></li>
         </ul>
     </nav>
+</header>
+
+<div class="financeiro-container">
+    <h1>Controle Financeiro</h1>
+
+    <div class="filtros">
+        <input type="date" id="dataInicio">
+        <input type="date" id="dataFim">
+        <input type="text" placeholder="Buscar por cliente..." id="filtroCliente">
+        <button onclick="filtrarFinanceiro()">Filtrar</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Forma de Pagamento</th>
+                <th>Valor Pago</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaFinanceiro">
+            <!-- Preenchido via backend ou JS -->
+            <tr>
+                <td>2025-07-31</td>
+                <td>João da Silva</td>
+                <td>Pix</td>
+                <td>R$ 250,00</td>
+                <td>Concluído</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="resumo">
+        <div class="resumo-item">
+            Total Recebido <span>R$ 5.320,00</span>
+        </div>
+        <div class="resumo-item">
+            Total Pendências <span>R$ 350,00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+function filtrarFinanceiro() {
+    const inicio = document.getElementById('dataInicio').value;
+    const fim = document.getElementById('dataFim').value;
+    const cliente = document.getElementById('filtroCliente').value;
+
+    console.log("Filtrar por:", { inicio, fim, cliente });
+
+    // Aqui você faria a chamada para seu backend Laravel (ex: /api/financeiro?inicio=...&fim=...)
+}
+</script>
+
+</body>
+</html>

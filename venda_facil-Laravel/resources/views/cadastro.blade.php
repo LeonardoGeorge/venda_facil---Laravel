@@ -32,7 +32,7 @@
 }
 
 .logo span {
-  background: #7ac943;
+  background: #668a4c;
   color: #181818;
   padding: 2px 6px;
   border-radius: 3px;
