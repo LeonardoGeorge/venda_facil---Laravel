@@ -1,87 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sistema de Vendas - Supermercado</title>
     <link rel="stylesheet" href="style.css">
-
     <style>
+    /* SEU CSS PERMANECE EXATAMENTE IGUAL */
     body {
         margin: 0;
         font-family: 'Segoe UI', sans-serif;
         background-color: #000000;
     }
 
-a {
-    text-decoration: none;
-    color: inherit; /* Herda a cor do elemento pai */
-}
-.top-bar {
-  background: #111;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 40px;
-  flex-wrap: wrap;
-}
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
 
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
-}
+    .top-bar {
+        background: #111;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 40px;
+        flex-wrap: wrap;
+    }
 
-.logo span {
-  background: #7ac943;
-  color: #181818;
-  padding: 2px 6px;
-  border-radius: 3px;
-  margin-left: 4px;
-}
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+    }
 
-.menu {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  padding: 0;
-  margin: 0;
-}
+    .logo span {
+        background: #7ac943;
+        color: #181818;
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin-left: 4px;
+    }
 
-.menu li a {
-  color: rgb(250, 234, 234);
-  text-decoration: none;
-  font-size: 16px;
-}
+    .menu {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+        padding: 0;
+        margin: 0;
+    }
 
-.menu li a:hover {
-  color: #7ac943;
-}
+    .menu li a {
+        color: rgb(250, 234, 234);
+        text-decoration: none;
+        font-size: 16px;
+    }
 
-.auth-buttons {
-  display: flex;
-  gap: 10px;
-}
+    .menu li a:hover {
+        color: #7ac943;
+    }
 
-.btn-outline {
-  background: transparent;
-  color: white;
-  border: 1px solid white;
-  padding: 5px 15px;
-  cursor: pointer;
-}
+    .auth-buttons {
+        display: flex;
+        gap: 10px;
+    }
 
-.btn-solid {
-  background: #7ac943;
-  color: black;
-  border: none;
-  padding: 5px 15px;
-  cursor: pointer;
-}
+    .btn-outline {
+        background: transparent;
+        color: white;
+        border: 1px solid white;
+        padding: 5px 15px;
+        cursor: pointer;
+    }
 
-
+    .btn-solid {
+        background: #7ac943;
+        color: black;
+        border: none;
+        padding: 5px 15px;
+        cursor: pointer;
+    }
 
     .pdv-container {
         padding: 20px;
@@ -154,11 +152,11 @@ a {
         border-radius: 4px;
     }
 
-        .btn-venda:hover {
+    .btn-venda:hover {
         background-color: #38770c;
-        }
+    }
 
-        .nota pre {
+    .nota pre {
         background: #f1f1f1;
         padding: 10px;
         font-family: monospace;
@@ -167,90 +165,53 @@ a {
         overflow-y: auto;
         white-space: pre-wrap;
         border-radius: 4px;
-        }
+    }
 
-        .totais {
+    .totais {
         display: flex;
         justify-content: space-between;
         margin-top: 20px;
         gap: 10px;
-        }
+    }
 
-        .volumes input {
+    .volumes input {
         width: 100px;
         padding: 6px;
         font-size: 16px;
-        }
+    }
 
-        .total-venda {
+    .total-venda {
         text-align: right;
-        }
+    }
 
-        .total-venda label {
+    .total-venda label {
         display: block;
         font-weight: bold;
         margin-bottom: 5px;
-        }
+    }
 
-        .total-destaque {
+    .total-destaque {
         font-size: 24px;
         font-weight: bold;
         color: red;
-        }
-        .pay {
-            margin-top: 20px;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-        }
+    }
 
+    .pay {
+        margin-top: 20px;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+    }
 
+    .total-pagamento {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+    }
 
-</style>
-</head>
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Sistema de Vendas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            
-        }
-
-        .pdv-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .pdv-content {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .input-group {
-            margin-bottom: 10px;
-        }
-
-        .nota {
-            background-color: #eee;
-            padding: 10px;
-            white-space: pre-wrap;
-        }
-
-        .total-destaque {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 5px;
-        }
-        .pay {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    .valor-pago, .troco {
+        flex: 1;
+    }
     </style>
 </head>
 
@@ -275,28 +236,28 @@ a {
         <div class="pdv-content">
             <section class="left-panel">
                 <div class="input-group">
-                    <label>Código</label>
-                    <input type="text" id="codigo" placeholder="0001">
+                    <label>Código do Produto</label>
+                    <input type="text" id="codigo" placeholder="Digite o código">
                 </div>
                 <div class="input-group">
                     <label>Quantidade</label>
-                    <input type="number" id="quantidade" value="1">
+                    <input type="number" id="quantidade" value="1" min="1">
                 </div>
                 <div class="input-group">
                     <label>Valor Unitário (R$)</label>
-                    <input type="text" id="valorUnitario" value="0,00" placeholder="0,00">
+                    <input type="text" id="valorUnitario" value="0,00" readonly>
                 </div>
                 <div class="input-group">
                     <label>Valor Total</label>
                     <input type="text" id="valorTotal" readonly>
                 </div>
 
-                <button class="btn-venda" onclick="adicionarItem()">VENDA</button>
+                <button class="btn-venda" onclick="adicionarItem()">ADICIONAR ITEM</button>
             </section>
 
             <section class="right-panel">
-                <div class="nota" id="notaFiscal">
-                    <strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong>
+                <div class="nota">
+                    <pre id="notaFiscal"><strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong></pre>
                 </div>
 
                 <div class="totais">
@@ -311,44 +272,55 @@ a {
                 </div>
             </section>     
         </div>
-           <section class="pay">
-                <div class="input-group">
-                    <label>Cliente</label>
-                    <input type="text" id="cliente" placeholder="Nome do Cliente">
-                    <div class="total-pagamento">
-                        <div class="valor-pago">
-                            <label>Valor Pago</label>
-                            <input type="text" id="valorPago" placeholder="0,00">
-                        </div>
-                        <div class="troco">
-                            <label>Troco</label>
-                            <input type="text" id="troco" readonly>
-                        </div>    
-                    </div>
-
-                    <label>Forma de Pagamento</label>
-                    <select id="formaPagamento">
-                        <option value="pix">Pix</option>
-                        <option value="dinheiro">Dinheiro</option>
-                        <option value="cartao-debito">Cartão de Debito</option>
-                        <option value="cartao-debito">Cartão de Credito</option>
-                    </select>
+        
+        <section class="pay">
+            <div class="input-group">
+                <label>Cliente</label>
+                <input type="text" id="cliente" placeholder="Nome do Cliente">
+            </div>
+            
+            <div class="total-pagamento">
+                <div class="valor-pago">
+                    <label>Valor Pago</label>
+                    <input type="text" id="valorPago" placeholder="0,00">
                 </div>
-                <button class="btn-venda" onclick="finalizarVenda()">Finalizar Venda</button>
-            </section>
+                <div class="troco">
+                    <label>Troco</label>
+                    <input type="text" id="troco" readonly>
+                </div>    
+            </div>
+
+            <div class="input-group">
+                <label>Forma de Pagamento</label>
+                <select id="formaPagamento">
+                    <option value="pix">Pix</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="cartao-debito">Cartão de Débito</option>
+                    <option value="cartao-credito">Cartão de Crédito</option>
+                </select>
+            </div>
+            
+            <button class="btn-venda" onclick="finalizarVenda()">FINALIZAR VENDA</button>
+        </section>
     </div>
 
     <script>
+        // Variáveis globais
         let contadorItem = 1;
         let totalVenda = 0;
         let totalItens = 0;
+        let produtosSelecionados = [];
         let nomeProdutoAtual = '';
 
+        // Token CSRF para proteção
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
+        // Formatação de números
         function formatarNumero(valor) {
             return parseFloat(valor).toFixed(2).replace('.', ',');
         }
 
+        // Atualizar valor total do item
         function atualizarValorTotal() {
             const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
             const valorUnitario = parseFloat(document.getElementById('valorUnitario').value.replace(',', '.')) || 0;
@@ -356,127 +328,164 @@ a {
             document.getElementById('valorTotal').value = formatarNumero(valorTotal);
         }
 
-        function adicionarItem() {
-            const codigo = document.getElementById('codigo').value;
-            const quantidade = parseFloat(document.getElementById('quantidade').value);
-            const valorUnitario = parseFloat(document.getElementById('valorUnitario').value.replace(',', '.'));
+        // Buscar produto pelo código
+        async function buscarProduto(codigo) {
+            try {
+                const response = await fetch(`/api/produtos/${codigo}`);
+                if (!response.ok) throw new Error('Produto não encontrado');
+                
+                const produto = await response.json();
+                return produto;
+            } catch (error) {
+                console.error('Erro ao buscar produto:', error);
+                alert('Produto não encontrado!');
+                return null;
+            }
+        }
 
-            if (!codigo || !quantidade || !valorUnitario) {
+        // Adicionar item à venda
+        async function adicionarItem() {
+            const codigo = document.getElementById('codigo').value.trim();
+            const quantidade = parseFloat(document.getElementById('quantidade').value);
+            const valorUnitarioInput = document.getElementById('valorUnitario').value;
+
+            if (!codigo || !quantidade || quantidade <= 0 || !valorUnitarioInput) {
                 alert("Preencha todos os campos corretamente.");
                 return;
             }
 
-            const valorTotal = quantidade * valorUnitario;
-            totalVenda += valorTotal;
+            const valorUnitario = parseFloat(valorUnitarioInput.replace(',', '.'));
+            const valorTotalItem = quantidade * valorUnitario;
+
+            // Buscar informações do produto
+            const produto = await buscarProduto(codigo);
+            if (!produto) return;
+
+            // Adicionar à lista de produtos
+            produtosSelecionados.push({
+                id: produto.id,
+                quantidade: quantidade,
+                preco_unitario: valorUnitario
+            });
+
+            // Atualizar totais
+            totalVenda += valorTotalItem;
             totalItens += quantidade;
 
+            // Atualizar interface
             const nota = document.getElementById('notaFiscal');
-            nota.innerHTML += `\n${String(contadorItem).padStart(3, '0')}   ${codigo.padEnd(10)} ${nomeProdutoAtual.padEnd(20)} ${formatarNumero(valorUnitario).padStart(8)}   ${formatarNumero(valorTotal).padStart(8)}`;
+            nota.innerHTML += `\n${String(contadorItem).padStart(3, '0')}   ${codigo.padEnd(10)} ${produto.nome.padEnd(20)} ${formatarNumero(valorUnitario).padStart(8)}   ${formatarNumero(valorTotalItem).padStart(8)}`;
 
-
-            document.getElementById('volumes').value = totalItens.toFixed(0);
+            document.getElementById('volumes').value = totalItens;
             document.getElementById('totalVenda').innerText = "R$ " + formatarNumero(totalVenda);
 
             contadorItem++;
 
-            // Limpa os campos
+            // Limpar campos
             document.getElementById('codigo').value = '';
             document.getElementById('quantidade').value = 1;
-            document.getElementById('valorUnitario').value = '';
+            document.getElementById('valorUnitario').value = '0,00';
             document.getElementById('valorTotal').value = '';
-            nomeProdutoAtual = '';
+            document.getElementById('codigo').focus();
         }
+
+        // Calcular troco
         function calcularTroco() {
-            const totalVendaTexto = document.getElementById('totalVenda').innerText.replace('R$ ', '').replace(',', '.');
-            const valorPagoTexto = document.getElementById('valorPago').value.replace(',', '.');
-
-            const totalVenda = parseFloat(totalVendaTexto) || 0;
-            const valorPago = parseFloat(valorPagoTexto) || 0;
-
+            const valorPago = parseFloat(document.getElementById('valorPago').value.replace(',', '.')) || 0;
             const troco = valorPago - totalVenda;
-
             document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
         }
 
-        document.getElementById('valorPago').addEventListener('input', calcularTroco);
+        // Finalizar venda
+        async function finalizarVenda() {
+            if (produtosSelecionados.length === 0) {
+                alert("Adicione pelo menos um produto!");
+                return;
+            }
 
-        // Atualiza valor total em tempo real
-        document.getElementById('quantidade').addEventListener('input', atualizarValorTotal);
-        document.getElementById('valorUnitario').addEventListener('input', atualizarValorTotal);
-    
-        // Executar adicionarItem() ao apertar Enter em qualquer input
-      ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); // evita comportamento padrão
-            adicionarItem();
-        }
-    });
-});
+            const cliente = document.getElementById('cliente').value.trim();
+            const formaPagamento = document.getElementById('formaPagamento').value;
 
+            if (!cliente) {
+                alert("Informe o nome do cliente!");
+                return;
+            }
 
+            try {
+                const response = await fetch('/venda/registrar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        cliente: cliente,
+                        forma_pagamento: formaPagamento,
+                        valor_total: totalVenda,
+                        produtos: produtosSelecionados
+                    })
+                });
 
-// Buscar produto ao digitar código
-document.getElementById('codigo').addEventListener('change', async function () {
-    const codigo = this.value;
+                const result = await response.json();
 
-    if (!codigo) return;
-
-    try {
-        const response = await fetch(`/api/produtos/${codigo}`);
-        const produto = await response.json();
-
-        if (produto.erro) {
-            alert(produto.erro);
-            return;
-        }
-
-        document.getElementById('valorUnitario').value = formatarNumero(produto.preco_saida || 0);
-        atualizarValorTotal();
-
-        // ✅ Armazenar o nome do produto para mostrar na nota
-        nomeProdutoAtual = produto.nome_produto || 'Produto Desconhecido';
-
-    } catch (error) {
-        console.error('Erro ao buscar produto:', error);
-    }
-});
-
-
-// Buscar cliente ao digitar nome
-document.getElementById('cliente').addEventListener('blur', async function () {
-    const nome = this.value;
-
-    if (!nome) return;
-
-    try {
-        const response = await fetch(`/api/clientes/${nome}`);
-        const cliente = await response.json();
-
-        if (cliente.erro) {
-            alert(cliente.erro);
-            return;
+                if (response.ok) {
+                    alert('Venda registrada com sucesso!');
+                    limparVenda();
+                } else {
+                    alert('Erro: ' + result.mensagem);
+                }
+            } catch (error) {
+                console.error('Erro ao finalizar venda:', error);
+                alert('Erro ao finalizar venda!');
+            }
         }
 
+        // Limpar toda a venda
+        function limparVenda() {
+            contadorItem = 1;
+            totalVenda = 0;
+            totalItens = 0;
+            produtosSelecionados = [];
+            
+            document.getElementById('notaFiscal').innerHTML = '<strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong>';
+            document.getElementById('volumes').value = '0';
+            document.getElementById('totalVenda').innerText = 'R$ 0,00';
+            document.getElementById('cliente').value = '';
+            document.getElementById('valorPago').value = '';
+            document.getElementById('troco').value = '';
+            document.getElementById('formaPagamento').selectedIndex = 0;
+        }
 
-        // Aqui você pode usar os dados do cliente se quiser, por exemplo:
-        console.log('Cliente encontrado:', cliente);
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscar produto ao digitar código
+            document.getElementById('codigo').addEventListener('change', async function() {
+                const codigo = this.value.trim();
+                if (!codigo) return;
 
-    } catch (error) {
-        console.error('Erro ao buscar cliente:', error);
-    }
+                const produto = await buscarProduto(codigo);
+                if (produto) {
+                    document.getElementById('valorUnitario').value = formatarNumero(produto.preco);
+                    atualizarValorTotal();
+                }
+            });
 
+            // Calcular troco em tempo real
+            document.getElementById('valorPago').addEventListener('input', calcularTroco);
 
+            // Atualizar valor total em tempo real
+            document.getElementById('quantidade').addEventListener('input', atualizarValorTotal);
 
-});
-</script>
-
-
-
-    
+            // Enter para adicionar item
+            ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
+                document.getElementById(id).addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        adicionarItem();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
-
 </html>
-
-
-

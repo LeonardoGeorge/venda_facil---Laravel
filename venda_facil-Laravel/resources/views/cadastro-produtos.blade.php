@@ -156,7 +156,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('produtos.store') }}"> 
+            <form method="POST" action="{{ route('cadastro.produtos.store') }}"> 
                 @csrf
                 <label>Nome do Produto:</label>
                 <input type="text" name="nome_produto" required>

@@ -15,4 +15,21 @@ class Produto extends Model
             'quantidade',
             'fornecedor',
     ];
+    protected $casts = [
+        'preco' => 'decimal:2',
+        'estoque' => 'integer',
+        'ativo' => 'boolean'
+    ];
+
+    public function vendas()
+    {
+        return $this->belongsToMany(Venda::class, 'venda_produtos')
+            ->withPivot('quantidade', 'preco_unitario', 'subtotal')
+            ->withTimestamps();
+    }
+
+    public function itensVenda()
+    {
+        return $this->hasMany(VendaProduto::class);
+    }
 }

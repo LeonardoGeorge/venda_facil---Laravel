@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\VendaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,11 +49,30 @@ Route::middleware('auth')->group(
         Route::get('/venda', function () {
             return view('venda');
         })->name('venda');
+        
+        // Rotas para vendas
+        Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
+        Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
+        Route::get('/venda/produto/{id}', [VendaController::class, 'buscarProduto'])->name('venda.buscar.produto');
 
         Route::get('/cadastro', function () {
             return view('cadastro');
         })->name('cadastro');
+
+        // Rota para MOSTRAR o formulário (GET)
+        Route::get('/cadastro-produtos', [ProdutoController::class, 'create'])
+        ->name('cadastro.produtos.form');
+
+        // Rota para PROCESSAR o formulário (POST)  
+        Route::post('/cadastro-produtos', [ProdutoController::class, 'store'])
+        ->name('cadastro.produtos.store');
+
+        // Ou use resource (recomendado)
+        Route::resource('produtos', ProdutoController::class);
+        
+       
     }
+
 );
 
 require __DIR__.'/auth.php';

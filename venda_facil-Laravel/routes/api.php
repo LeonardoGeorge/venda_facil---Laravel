@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\VendaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +21,8 @@ Route::get('/financeiro', [App\Http\Controllers\FinanceiroController::class, 'fi
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+// API para buscar produto
+Route::get('/api/produtos/{id}', [ProdutoController::class, 'show']);
+
+// Rota para registrar venda
+Route::post('/venda/registrar', [VendaController::class, 'registrarVenda']);
