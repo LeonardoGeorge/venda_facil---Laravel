@@ -24,7 +24,6 @@ a {
   flex-wrap: wrap;
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
 .logo {
@@ -62,10 +61,9 @@ a {
 .auth-buttons {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
-.auth-buttons a, .auth-buttons button {
+.auth-buttons a {
     display: inline-block;
     text-align: center;
     text-decoration: none;
@@ -73,9 +71,6 @@ a {
     border-radius: 4px;
     font-size: 14px;
     font-weight: bold;
-    cursor: pointer;
-    border: none;
-    font-family: inherit;
 }
 
 .btn-outline {
@@ -97,25 +92,6 @@ a {
 
 .btn-solid:hover {
     background: #68a836;
-}
-
-.btn-welcome {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-}
-
-.btn-welcome:hover {
-    background: #5a6268;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #7ac943;
-    font-weight: bold;
 }
 
 .section-cards {
@@ -188,20 +164,8 @@ a {
         </ul>
     </nav>
     <div class="auth-buttons">
-        @auth
-            <!-- Usuário logado -->
-            <div class="user-info">
-                <span>Olá, {{ Auth::user()->name }}!</span>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn-outline">Sair</button>
-            </form>
-        @else
-            <!-- Visitante -->
-            <a href="{{ route('login') }}" class="btn-outline">Entrar</a>
-            <a href="{{ route('register') }}" class="btn-solid">Criar Conta</a>
-        @endauth
+        <a href="{{ route('login') }}" class="btn-outline">Entrar</a>
+        <a href="{{ route('register') }}" class="btn-solid">Criar Conta</a>
     </div>
 </header>
 
