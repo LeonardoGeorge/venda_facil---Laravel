@@ -137,8 +137,8 @@
     <div class="logo"><a href="http://localhost:8000/" style="color: white;">Venda<span>FACIL</span></a></div>
     <nav>
         <ul class="menu">
+            <li><a href="http://localhost:8000/venda">Vendas</a></li>
             <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-            <li><a href="http://localhost:8000/clientes">Clientes</a></li>
             <li><a href="http://localhost:8000/produtos">Produtos</a></li>
             <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
             <li><a href="http://localhost:8000/estoque">Estoque</a></li>
