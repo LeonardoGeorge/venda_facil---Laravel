@@ -153,8 +153,12 @@ a {
         </ul>
     </nav>
     <div class="auth-buttons">
-        <button class="btn-outline">Entrar</button>
-        <button class="btn-solid">Criar Conta</button>
+        <button class="btn-outline">
+          <a href="{{ route('login') }}" class="btn btn-primary">Entrar</a>
+        </button>
+        <button class="btn-solid">
+          <a href="{{ route('register') }}" class="btn btn-success">Criar Conta</a>
+        </button>
     </div>
 </header>
 <body>

@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('clientes', function (Blueprint $table) {
-            $table->timestamps(); // Adiciona created_at e updated_at
+        Schema::table('users', function (Blueprint $table) {
+            //
+            $table->string('phone')->nullable()->after('email');
         });
     }
 
@@ -25,8 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('clientes', function (Blueprint $table) {
-            $table->dropTimestamps();
+        Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 };
