@@ -240,6 +240,9 @@
                     <input type="text" id="codigo" placeholder="Digite o código">
                 </div>
                 <div class="input-group">
+                    <label>Produto</label>
+                </div>
+                <div class="input-group">
                     <label>Quantidade</label>
                     <input type="number" id="quantidade" value="1" min="1">
                 </div>
@@ -317,7 +320,8 @@
 
         // Formatação de números
         function formatarNumero(valor) {
-            return parseFloat(valor).toFixed(2).replace('.', ',');
+            const numero = parseFloat(valor);
+            return isNaN(numero) ? '0,00' : numero.toFixed(2).replace('.', ',');
         }
 
         // Atualizar valor total do item
@@ -354,6 +358,7 @@
 
             const valorUnitario = parseFloat(valorUnitarioInput.replace(',', '.'));
             const valorTotalItem = quantidade * valorUnitario;
+
 
             // Buscar informações do produto
             const produto = await buscarProduto(codigo);
@@ -462,9 +467,21 @@
                 if (!codigo) return;
 
                 const produto = await buscarProduto(codigo);
-                if (produto) {
-                    document.getElementById('valorUnitario').value = formatarNumero(produto.preco);
-                    atualizarValorTotal();
+                if (produto && produto.preco) 
+                {
+                    const preco = parseFloat(produto.preco)
+                    if (!isNAN(preco)) {
+                        document.getElementById('valorUnitario').value = formatarNumero(produto.preco);
+                        atualizarValorTotal();
+                    } else {
+                        document.getElementById('valorUnitario').value = '0,00';
+                        document.getElementById('valorTotal').value = '0,00';
+                        alert('Preço do produto inválido');
+                    }
+                } else {
+                    alert('Produto não encontrado');
+                    document.getElementById('valorUnitario').value = '0,00';
+                    document.getElementById('valorTotal').value = '0,00';
                 }
             });
 
