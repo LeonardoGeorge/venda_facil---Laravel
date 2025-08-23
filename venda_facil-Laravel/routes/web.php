@@ -49,11 +49,11 @@ Route::middleware('auth')->group(
         Route::get('/venda', function () {
             return view('venda');
         })->name('venda');
-        
+
         // Rotas para vendas
         Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
         Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
-        Route::get('/venda/produto/{id}', [VendaController::class, 'buscarProduto'])->name('venda.buscar.produto');
+        Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
         Route::get('/cadastro', function () {
             return view('cadastro');

@@ -328,17 +328,15 @@
             document.getElementById('valorTotal').value = formatarNumero(valorTotal);
         }
 
-        // Buscar produto pelo código
+        
+       // Busca o produto pelo código
         async function buscarProduto(codigo) {
             try {
                 const response = await fetch(`/api/produtos/${codigo}`);
-                if (!response.ok) throw new Error('Produto não encontrado');
-                
                 const produto = await response.json();
-                return produto;
+                return produto; // Retorna os dados do produto do banco
             } catch (error) {
                 console.error('Erro ao buscar produto:', error);
-                alert('Produto não encontrado!');
                 return null;
             }
         }

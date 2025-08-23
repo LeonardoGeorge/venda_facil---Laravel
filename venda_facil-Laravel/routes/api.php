@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 // API para buscar produto
-Route::get('/api/produtos/{id}', [ProdutoController::class, 'show']);
+Route::get('/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
 // Rota para registrar venda
 Route::post('/venda/registrar', [VendaController::class, 'registrarVenda']);

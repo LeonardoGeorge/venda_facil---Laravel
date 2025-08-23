@@ -29,15 +29,21 @@ class ProdutoController extends Controller
         return redirect()->route('produtos.index')->with('success', 'Produto cadastrado com sucesso!');
     }
 
-    public function buscarPorCodigo($codigo)
+    public function buscarProduto($id)
     {
-        $produto = \App\Models\Produto::where('id', $codigo)->first();
+        // Busca o produto pelo ID na tabela 'produtos'
+        $produto = Produto::find($id);
 
         if (!$produto) {
             return response()->json(['erro' => 'Produto não encontrado'], 404);
         }
 
-        return response()->json($produto);
+        return response()->json([
+            'id' => $produto->id,
+            'nome' => $produto->nome,
+            'preco' => $produto->preco,
+            'estoque' => $produto->estoque,
+        ]);
     }
     
 }
