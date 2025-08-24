@@ -149,7 +149,7 @@ small {
                 </ul>
               </div>
             @endif
-            <form action="{{ route('clientes.store') }}" method="POST">
+            <form action="{{ route('cadastro.clientes.index') }}" method="POST">
                 @csrf
               <label>Nome:</label>
               <input type="text" name="nome" required>

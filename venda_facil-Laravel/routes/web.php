@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
+use App\Http\Controllers\ClienteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,7 +70,13 @@ Route::middleware('auth')->group(
 
         // Ou use resource (recomendado)
         Route::resource('produtos', ProdutoController::class);
+
         
+        Route::get('/cadastro-clientes', [ClienteController::class, 'create'])
+            ->name('cadastro.clientes.form');
+
+        Route::post('/cadastro-clientes', [ClienteController::class, 'index'])
+            ->name('cadastro.clientes.index');
        
     }
 
