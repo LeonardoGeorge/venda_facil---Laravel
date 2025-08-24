@@ -307,7 +307,8 @@
         </section>
     </div>
 
-<script>
+
+   <script>
     // Variáveis globais
     let contadorItem = 1;
     let totalVenda = 0;
