@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Produto;
+use Illuminate\Support\Facades\Log;
 
 class ProdutoController extends Controller
 {
@@ -31,7 +32,9 @@ class ProdutoController extends Controller
 
     public function buscarProduto($id)
     {
-        // Busca o produto pelo ID na tabela 'produtos'
+        Log::info("=== BUSCANDO PRODUTO ID: $id ===");
+        Log::info("ID recebido: " . $id);
+
         $produto = Produto::find($id);
 
         if (!$produto) {
@@ -40,9 +43,11 @@ class ProdutoController extends Controller
 
         return response()->json([
             'id' => $produto->id,
-            'nome' => $produto->nome,
-            'preco' => $produto->preco,
-            'estoque' => $produto->estoque,
+            'nome_produto' => $produto->nome_produto,
+            'preco_saida' => $produto->preco_saida,
+            'quantidade' => $produto->quantidade,
+            'categoria' => $produto->categoria,
+            'fornecedor' => $produto->fornecedor
         ]);
     }
     

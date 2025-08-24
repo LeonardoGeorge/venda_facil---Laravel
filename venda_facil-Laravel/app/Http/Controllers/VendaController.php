@@ -79,9 +79,11 @@ class VendaController extends Controller
 
         return response()->json([
             'id' => $produto->id,
-            'nome' => $produto->nome,
-            'preco' => $produto->preco,
-            'estoque' => $produto->estoque
+            'nome_produto' => $produto->nome_produto,
+            'preco_saida' => $produto->preco_saida,
+            'quantidade' => $produto->quantidade,
+            'categoria' => $produto->categoria,
+            'fornecedor' => $produto->fornecedor
         ]);
     }
 }

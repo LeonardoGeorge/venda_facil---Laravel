@@ -307,200 +307,189 @@
         </section>
     </div>
 
-    <script>
-        // Variáveis globais
-        let contadorItem = 1;
-        let totalVenda = 0;
-        let totalItens = 0;
-        let produtosSelecionados = [];
-        let nomeProdutoAtual = '';
+<script>
+    // Variáveis globais
+    let contadorItem = 1;
+    let totalVenda = 0;
+    let totalItens = 0;
+    let produtosSelecionados = [];
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-        // Token CSRF para proteção
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    // Formatar números para R$
+    function formatarNumero(valor) {
+        const numero = parseFloat(valor);
+        return isNaN(numero) ? '0,00' : numero.toFixed(2).replace('.', ',');
+    }
 
-        // Formatação de números
-        function formatarNumero(valor) {
-            const numero = parseFloat(valor);
-            return isNaN(numero) ? '0,00' : numero.toFixed(2).replace('.', ',');
+    // Atualiza o valor total do item baseado na quantidade e preço unitário
+    function atualizarValorTotal() {
+        const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
+        const valorUnitario = parseFloat(document.getElementById('valorUnitario').value.replace(',', '.')) || 0;
+        const valorTotal = quantidade * valorUnitario;
+        document.getElementById('valorTotal').value = formatarNumero(valorTotal);
+    }
+
+    // Buscar produto pelo código
+    async function buscarProduto(codigo) {
+        try {
+            const response = await fetch(`/api/produtos/${codigo}`);
+            if (!response.ok) return null;
+            return await response.json();
+        } catch (error) {
+            console.error('Erro ao buscar produto:', error);
+            return null;
         }
+    }
 
-        // Atualizar valor total do item
-        function atualizarValorTotal() {
-            const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
-            const valorUnitario = parseFloat(document.getElementById('valorUnitario').value.replace(',', '.')) || 0;
-            const valorTotal = quantidade * valorUnitario;
-            document.getElementById('valorTotal').value = formatarNumero(valorTotal);
-        }
+    // Preencher valor unitário ao digitar o código
+    document.getElementById('codigo').addEventListener('blur', async function () {
+        const codigo = this.value.trim();
+        if (!codigo) return;
 
-        
-       // Busca o produto pelo código
-        async function buscarProduto(codigo) {
-            try {
-                const response = await fetch(`/api/produtos/${codigo}`);
-                const produto = await response.json();
-                return produto; // Retorna os dados do produto do banco
-            } catch (error) {
-                console.error('Erro ao buscar produto:', error);
-                return null;
-            }
-        }
-
-        // Adicionar item à venda
-        async function adicionarItem() {
-            const codigo = document.getElementById('codigo').value.trim();
-            const quantidade = parseFloat(document.getElementById('quantidade').value);
-            const valorUnitarioInput = document.getElementById('valorUnitario').value;
-
-            if (!codigo || !quantidade || quantidade <= 0 || !valorUnitarioInput) {
-                alert("Preencha todos os campos corretamente.");
-                return;
-            }
-
-            const valorUnitario = parseFloat(valorUnitarioInput.replace(',', '.'));
-            const valorTotalItem = quantidade * valorUnitario;
-
-
-            // Buscar informações do produto
-            const produto = await buscarProduto(codigo);
-            if (!produto) return;
-
-            // Adicionar à lista de produtos
-            produtosSelecionados.push({
-                id: produto.id,
-                quantidade: quantidade,
-                preco_unitario: valorUnitario
-            });
-
-            // Atualizar totais
-            totalVenda += valorTotalItem;
-            totalItens += quantidade;
-
-            // Atualizar interface
-            const nota = document.getElementById('notaFiscal');
-            nota.innerHTML += `\n${String(contadorItem).padStart(3, '0')}   ${codigo.padEnd(10)} ${produto.nome.padEnd(20)} ${formatarNumero(valorUnitario).padStart(8)}   ${formatarNumero(valorTotalItem).padStart(8)}`;
-
-            document.getElementById('volumes').value = totalItens;
-            document.getElementById('totalVenda').innerText = "R$ " + formatarNumero(totalVenda);
-
-            contadorItem++;
-
-            // Limpar campos
-            document.getElementById('codigo').value = '';
-            document.getElementById('quantidade').value = 1;
+        const produto = await buscarProduto(codigo);
+        if (produto && produto.preco_saida) {
+            document.getElementById('valorUnitario').value = formatarNumero(produto.preco_saida);
+            atualizarValorTotal();
+        } else {
+            alert('Produto não encontrado');
             document.getElementById('valorUnitario').value = '0,00';
-            document.getElementById('valorTotal').value = '';
-            document.getElementById('codigo').focus();
+            document.getElementById('valorTotal').value = '0,00';
+        }
+    });
+
+    // Atualizar valor total quando mudar a quantidade
+    document.getElementById('quantidade').addEventListener('input', atualizarValorTotal);
+
+    // Função para adicionar item
+    async function adicionarItem() {
+        const codigo = document.getElementById('codigo').value.trim();
+        const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
+        const valorUnitarioInput = document.getElementById('valorUnitario').value;
+
+        if (!codigo || quantidade <= 0 || valorUnitarioInput === '0,00') {
+            alert("Preencha todos os campos corretamente.");
+            return;
         }
 
-        // Calcular troco
-        function calcularTroco() {
-            const valorPago = parseFloat(document.getElementById('valorPago').value.replace(',', '.')) || 0;
-            const troco = valorPago - totalVenda;
-            document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
+        const valorUnitario = parseFloat(valorUnitarioInput.replace(',', '.'));
+        const valorTotalItem = quantidade * valorUnitario;
+
+        // Buscar produto para pegar nome
+        const produto = await buscarProduto(codigo);
+        if (!produto) {
+            alert('Produto não encontrado');
+            return;
         }
 
-        // Finalizar venda
-        async function finalizarVenda() {
-            if (produtosSelecionados.length === 0) {
-                alert("Adicione pelo menos um produto!");
-                return;
-            }
-
-            const cliente = document.getElementById('cliente').value.trim();
-            const formaPagamento = document.getElementById('formaPagamento').value;
-
-            if (!cliente) {
-                alert("Informe o nome do cliente!");
-                return;
-            }
-
-            try {
-                const response = await fetch('/venda/registrar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({
-                        cliente: cliente,
-                        forma_pagamento: formaPagamento,
-                        valor_total: totalVenda,
-                        produtos: produtosSelecionados
-                    })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert('Venda registrada com sucesso!');
-                    limparVenda();
-                } else {
-                    alert('Erro: ' + result.mensagem);
-                }
-            } catch (error) {
-                console.error('Erro ao finalizar venda:', error);
-                alert('Erro ao finalizar venda!');
-            }
-        }
-
-        // Limpar toda a venda
-        function limparVenda() {
-            contadorItem = 1;
-            totalVenda = 0;
-            totalItens = 0;
-            produtosSelecionados = [];
-            
-            document.getElementById('notaFiscal').innerHTML = '<strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong>';
-            document.getElementById('volumes').value = '0';
-            document.getElementById('totalVenda').innerText = 'R$ 0,00';
-            document.getElementById('cliente').value = '';
-            document.getElementById('valorPago').value = '';
-            document.getElementById('troco').value = '';
-            document.getElementById('formaPagamento').selectedIndex = 0;
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Buscar produto ao digitar código
-            document.getElementById('codigo').addEventListener('change', async function() {
-                const codigo = this.value.trim();
-                if (!codigo) return;
-
-                const produto = await buscarProduto(codigo);
-                if (produto && produto.preco) 
-                {
-                    const preco = parseFloat(produto.preco)
-                    if (!isNAN(preco)) {
-                        document.getElementById('valorUnitario').value = formatarNumero(produto.preco);
-                        atualizarValorTotal();
-                    } else {
-                        document.getElementById('valorUnitario').value = '0,00';
-                        document.getElementById('valorTotal').value = '0,00';
-                        alert('Preço do produto inválido');
-                    }
-                } else {
-                    alert('Produto não encontrado');
-                    document.getElementById('valorUnitario').value = '0,00';
-                    document.getElementById('valorTotal').value = '0,00';
-                }
-            });
-
-            // Calcular troco em tempo real
-            document.getElementById('valorPago').addEventListener('input', calcularTroco);
-
-            // Atualizar valor total em tempo real
-            document.getElementById('quantidade').addEventListener('input', atualizarValorTotal);
-
-            // Enter para adicionar item
-            ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
-                document.getElementById(id).addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        adicionarItem();
-                    }
-                });
-            });
+        // Adicionar produto à lista
+        produtosSelecionados.push({
+            id: produto.id,
+            nome: produto.nome_produto,
+            quantidade: quantidade,
+            preco_unitario: valorUnitario
         });
-    </script>
+
+        // Atualizar totais
+        totalVenda += valorTotalItem;
+        totalItens += quantidade;
+
+        // Atualizar interface (nota fiscal)
+        const nota = document.getElementById('notaFiscal');
+        nota.innerHTML += `\n${String(contadorItem).padStart(3, '0')}   ${codigo.padEnd(10)} ${produto.nome_produto.padEnd(20)} ${formatarNumero(valorUnitario).padStart(8)}   ${formatarNumero(valorTotalItem).padStart(8)}`;
+
+        document.getElementById('volumes').value = totalItens;
+        document.getElementById('totalVenda').innerText = "R$ " + formatarNumero(totalVenda);
+
+        contadorItem++;
+
+        // Limpar campos
+        document.getElementById('codigo').value = '';
+        document.getElementById('quantidade').value = 1;
+        document.getElementById('valorUnitario').value = '0,00';
+        document.getElementById('valorTotal').value = '';
+        document.getElementById('codigo').focus();
+    }
+
+    // Calcular troco
+    function calcularTroco() {
+        const valorPago = parseFloat(document.getElementById('valorPago').value.replace(',', '.')) || 0;
+        const troco = valorPago - totalVenda;
+        document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
+    }
+
+    // Finalizar venda
+    async function finalizarVenda() {
+        if (produtosSelecionados.length === 0) {
+            alert("Adicione pelo menos um produto!");
+            return;
+        }
+
+        const cliente = document.getElementById('cliente').value.trim();
+        const formaPagamento = document.getElementById('formaPagamento').value;
+
+        if (!cliente) {
+            alert("Informe o nome do cliente!");
+            return;
+        }
+
+        try {
+            const response = await fetch('/venda/registrar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    cliente: cliente,
+                    forma_pagamento: formaPagamento,
+                    valor_total: totalVenda,
+                    produtos: produtosSelecionados
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Venda registrada com sucesso!');
+                limparVenda();
+            } else {
+                alert('Erro: ' + result.mensagem);
+            }
+        } catch (error) {
+            console.error('Erro ao finalizar venda:', error);
+            alert('Erro ao finalizar venda!');
+        }
+    }
+
+    // Limpar venda
+    function limparVenda() {
+        contadorItem = 1;
+        totalVenda = 0;
+        totalItens = 0;
+        produtosSelecionados = [];
+
+        document.getElementById('notaFiscal').innerHTML = '<strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong>';
+        document.getElementById('volumes').value = '0';
+        document.getElementById('totalVenda').innerText = 'R$ 0,00';
+        document.getElementById('cliente').value = '';
+        document.getElementById('valorPago').value = '';
+        document.getElementById('troco').value = '';
+        document.getElementById('formaPagamento').selectedIndex = 0;
+    }
+
+    // Event Listeners para Enter
+    ['codigo', 'quantidade', 'valorUnitario'].forEach(id => {
+        document.getElementById(id).addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                adicionarItem();
+            }
+        });
+    });
+
+    // Calcular troco em tempo real
+    document.getElementById('valorPago').addEventListener('input', calcularTroco);
+</script>
+
 </body>
 </html>
