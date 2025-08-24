@@ -308,13 +308,13 @@
         </section>
     </div>
 
-
-   <script>
+<script>
     // Variáveis globais
     let contadorItem = 1;
     let totalVenda = 0;
     let totalItens = 0;
     let produtosSelecionados = [];
+    let clienteSelecionado = null; // VARIÁVEL AUSENTE - ADICIONEI
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
     // Formatar números para R$
@@ -424,8 +424,8 @@
         document.getElementById('codigo').focus();
     }
 
-    // Buscar cliente em tempo real
-    documente.getElementById('cliente').addEventListener('input', async function(){
+    // CORREÇÃO: Buscar cliente em tempo real
+    document.getElementById('cliente').addEventListener('input', async function(){
         const nome = this.value.trim();
         const resultado = document.getElementById('resultadoCliente');
 
@@ -448,9 +448,9 @@
         }
     });
 
-    // Selecionar cliente 
+    // CORREÇÃO: Selecionar cliente 
     function selecionarCliente(id, nome) {
-        cliente Selecionado = id;
+        clienteSelecionado = id; // REMOVIDO ESPAÇO
         document.getElementById('cliente').value = nome;
         document.getElementById('resultadoCliente').style.display = 'none';
     }
@@ -462,7 +462,7 @@
         document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
     }
 
-    // Finalizar venda
+    // CORREÇÃO: Finalizar venda
     async function finalizarVenda() {
         if (produtosSelecionados.length === 0) {
             alert("Adicione pelo menos um produto!");
@@ -472,7 +472,8 @@
         const cliente = document.getElementById('cliente').value.trim();
         const formaPagamento = document.getElementById('formaPagamento').value;
 
-        if (!nomecliente) {
+        // CORREÇÃO: Use a variável correta
+        if (!cliente) {
             alert("Informe o nome do cliente!");
             return;
         }
@@ -484,8 +485,10 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
+                // CORREÇÃO: Envie os dados no formato que o controller espera
                 body: JSON.stringify({
-                    cliente: cliente,
+                    cliente_id: clienteSelecionado,
+                    cliente_nome: cliente, // Nome correto para o controller
                     forma_pagamento: formaPagamento,
                     valor_total: totalVenda,
                     produtos: produtosSelecionados
@@ -512,6 +515,7 @@
         totalVenda = 0;
         totalItens = 0;
         produtosSelecionados = [];
+        clienteSelecionado = null; // LIMPAR TAMBÉM O CLIENTE
 
         document.getElementById('notaFiscal').innerHTML = '<strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong>';
         document.getElementById('volumes').value = '0';
@@ -534,7 +538,8 @@
 
     // Calcular troco em tempo real
     document.getElementById('valorPago').addEventListener('input', calcularTroco);
-       // Fechar resultados de busca ao clicar fora
+    
+    // Fechar resultados de busca ao clicar fora
     document.addEventListener('click', function(e) {
         if (!document.getElementById('cliente').contains(e.target)) {
             document.getElementById('resultadoCliente').style.display = 'none';
