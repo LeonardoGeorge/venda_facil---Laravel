@@ -71,12 +71,16 @@ Route::middleware('auth')->group(
         // Ou use resource (recomendado)
         Route::resource('produtos', ProdutoController::class);
 
-        
+        Route::get('/clientes', [ClienteController::class, 'index'])
+            ->name('clientes.index');
+
         Route::get('/cadastro-clientes', [ClienteController::class, 'create'])
             ->name('cadastro.clientes.form');
 
-        Route::post('/cadastro-clientes', [ClienteController::class, 'index'])
-            ->name('cadastro.clientes.index');
+        Route::post('/cadastro-clientes', [ClienteController::class, 'store'])
+            ->name('cadastro.clientes.store');
+
+        Route::get('/buscar-cliente/{nome}', [ClienteController::class, 'buscarPorNome']);
        
     }
 

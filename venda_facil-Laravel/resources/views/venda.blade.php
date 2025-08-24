@@ -232,6 +232,7 @@
 
     <div class="pdv-container">
         <h1 class="product-title">Sistema Automático de Vendas</h1>
+  
 
         <div class="pdv-content">
             <section class="left-panel">
@@ -342,6 +343,18 @@
         }
     }
 
+    // Buscar cliente pelo nome
+    async function buscarCliente(nome) {
+        try {
+            const response = await fetch(`/buscar-cliente/${encodeURIComponent(nome)}`);
+            if(!response.ok) return null;
+            return await response.json();
+        } catch (error){
+            console.error('Erro ao buscar cliente', error);
+            return null;
+        }
+    }
+
     // Preencher valor unitário ao digitar o código
     document.getElementById('codigo').addEventListener('blur', async function () {
         const codigo = this.value.trim();
@@ -411,6 +424,32 @@
         document.getElementById('codigo').focus();
     }
 
+    // Buscar cliente em tempo real
+    documente.getElementById('buscarCliente').addEventListener('input', async function(){
+        const nome = this.value.trim();
+        const resultado = document.getElementById('resultadoCliente');
+
+        if (nome.length < 3) {
+            resultado.style.display = 'none';
+            return;
+        }
+
+        const cliente = await buscaCliente(nome);
+        if (cliente && !cliente.error) {
+            resultado.innerHTML = `
+            <div onclick="selecionarCliente(${cliente.id}, '${cliente.nome.replace(/'/g, "\\'")}')">
+                    ${cliente.nome} - ${cliente.telefone || 'Sem telefone'}
+                </div>
+            `;
+            resultado.style.display = 'block';
+        } else {
+            resultado.innerHTML = '<div>Cliente não encontrado</div>';
+            resultado.style.display = 'block';
+        }
+    });
+
+    // Selecionar cliente 
+
     // Calcular troco
     function calcularTroco() {
         const valorPago = parseFloat(document.getElementById('valorPago').value.replace(',', '.')) || 0;
@@ -444,7 +483,7 @@
                     cliente: cliente,
                     forma_pagamento: formaPagamento,
                     valor_total: totalVenda,
-                    produtos: produtosSelecionados
+                    data_venda: data
                 })
             });
 
@@ -490,6 +529,12 @@
 
     // Calcular troco em tempo real
     document.getElementById('valorPago').addEventListener('input', calcularTroco);
+       // Fechar resultados de busca ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('cliente').contains(e.target)) {
+            document.getElementById('resultadoCliente').style.display = 'none';
+        }
+    });
 </script>
 
 </body>
