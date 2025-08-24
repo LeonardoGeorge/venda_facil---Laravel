@@ -425,7 +425,7 @@
     }
 
     // Buscar cliente em tempo real
-    documente.getElementById('buscarCliente').addEventListener('input', async function(){
+    documente.getElementById('cliente').addEventListener('input', async function(){
         const nome = this.value.trim();
         const resultado = document.getElementById('resultadoCliente');
 
@@ -434,7 +434,7 @@
             return;
         }
 
-        const cliente = await buscaCliente(nome);
+        const cliente = await buscarCliente(nome);
         if (cliente && !cliente.error) {
             resultado.innerHTML = `
             <div onclick="selecionarCliente(${cliente.id}, '${cliente.nome.replace(/'/g, "\\'")}')">
@@ -449,6 +449,11 @@
     });
 
     // Selecionar cliente 
+    function selecionarCliente(id, nome) {
+        cliente Selecionado = id;
+        document.getElementById('cliente').value = nome;
+        document.getElementById('resultadoCliente').style.display = 'none';
+    }
 
     // Calcular troco
     function calcularTroco() {
@@ -467,7 +472,7 @@
         const cliente = document.getElementById('cliente').value.trim();
         const formaPagamento = document.getElementById('formaPagamento').value;
 
-        if (!cliente) {
+        if (!nomecliente) {
             alert("Informe o nome do cliente!");
             return;
         }
@@ -483,7 +488,7 @@
                     cliente: cliente,
                     forma_pagamento: formaPagamento,
                     valor_total: totalVenda,
-                    data_venda: data
+                    produtos: produtosSelecionados
                 })
             });
 

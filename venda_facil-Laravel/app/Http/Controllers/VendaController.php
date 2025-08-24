@@ -29,21 +29,18 @@ class VendaController extends Controller
 
             // Registrar a venda no banco de dados
             $venda = new Venda();
-            $venda->login = $dados['cliente_nome']; // Ou use cliente_id se disponível
+            $venda->login = $dados['cliente_nome']; // Campo no banco é "login"
             $venda->forma_pagamento = $dados['forma_pagamento'];
             $venda->valor_total = $dados['valor_total'];
-            $venda->data_venda = now();
+            $venda->data_venda = now(); // Campo no banco é "data_verda" - precisa ajustar
             $venda->save();
-
-            // Registrar os produtos vendidos (se você tiver uma tabela para isso)
-            foreach ($dados['produtos'] as $produto) {
-                // Aqui você precisaria criar um modelo para os itens da venda
-                // Exemplo: ItemVenda::create([...]);
-            }
 
             return response()->json(['mensagem' => 'Venda registrada com sucesso!']);
         } catch (\Exception $e) {
-            return response()->json(['mensagem' => 'Erro ao registrar venda: ' . $e->getMessage()], 500);
+            return response()->json([
+                'mensagem' => 'Erro ao registrar venda: ' . $e->getMessage(),
+                'erro' => $e->getMessage()
+            ], 500);
         }
     }
 
