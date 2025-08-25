@@ -2,11 +2,12 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sistema de Vendas - Supermercado</title>
     <link rel="stylesheet" href="style.css">
+    
     <style>
-    /* SEU CSS PERMANECE EXATAMENTE IGUAL */
     body {
         margin: 0;
         font-family: 'Segoe UI', sans-serif;
@@ -278,9 +279,11 @@
         </div>
         
         <section class="pay">
+            
             <div class="input-group">
                 <label>Cliente</label>
                 <input type="text" id="cliente" placeholder="Nome do Cliente">
+                <div id="resultadoCliente" style="display: none; border: 1px solid #ccc; max-height: 150px; overflow-y: auto;"></div>
             </div>
             
             <div class="total-pagamento">
@@ -346,7 +349,7 @@
     // Buscar cliente pelo nome
     async function buscarCliente(nome) {
         try {
-            const response = await fetch(`/buscar-cliente/${encodeURIComponent(nome)}`);
+            const response = await fetch(`/api/buscar-cliente/${encodeURIComponent(nome)}`);
             if(!response.ok) return null;
             return await response.json();
         } catch (error){
@@ -354,6 +357,20 @@
             return null;
         }
     }
+
+    // CORREÇÃO DA SELEÇÃO DE CLIENTE
+function selecionarCliente(id, nome) {
+    clienteSelecionado = id;
+    document.getElementById('cliente').value = nome;
+    const resultado = document.getElementById('resultadoCliente');
+    if (resultado) resultado.style.display = 'none';
+}
+
+// VERIFICAÇÃO DE ELEMENTOS ANTES DE MANIPULAR
+const resultadoCliente = document.getElementById('resultadoCliente');
+if (resultadoCliente) {
+    resultadoCliente.style.display = 'none';
+}
 
     // Preencher valor unitário ao digitar o código
     document.getElementById('codigo').addEventListener('blur', async function () {
@@ -448,11 +465,12 @@
         }
     });
 
-    // CORREÇÃO: Selecionar cliente 
+    
     function selecionarCliente(id, nome) {
-        clienteSelecionado = id; // REMOVIDO ESPAÇO
+        clienteSelecionado = id;
         document.getElementById('cliente').value = nome;
-        document.getElementById('resultadoCliente').style.display = 'none';
+        const resultado = document.getElementById('resultadoCliente');
+        if (resultado) resultado.style.display = 'none';
     }
 
     // Calcular troco
@@ -463,51 +481,50 @@
     }
 
     // CORREÇÃO: Finalizar venda
-    async function finalizarVenda() {
-        if (produtosSelecionados.length === 0) {
-            alert("Adicione pelo menos um produto!");
-            return;
-        }
-
-        const cliente = document.getElementById('cliente').value.trim();
-        const formaPagamento = document.getElementById('formaPagamento').value;
-
-        // CORREÇÃO: Use a variável correta
-        if (!cliente) {
-            alert("Informe o nome do cliente!");
-            return;
-        }
-
-        try {
-            const response = await fetch('/venda/registrar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                // CORREÇÃO: Envie os dados no formato que o controller espera
-                body: JSON.stringify({
-                    cliente_id: clienteSelecionado,
-                    cliente_nome: cliente, // Nome correto para o controller
-                    forma_pagamento: formaPagamento,
-                    valor_total: totalVenda,
-                    produtos: produtosSelecionados
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Venda registrada com sucesso!');
-                limparVenda();
-            } else {
-                alert('Erro: ' + result.mensagem);
-            }
-        } catch (error) {
-            console.error('Erro ao finalizar venda:', error);
-            alert('Erro ao finalizar venda!');
-        }
+   async function finalizarVenda() {
+    if (produtosSelecionados.length === 0) {
+        alert("Adicione pelo menos um produto!");
+        return;
     }
+
+    const cliente = document.getElementById('cliente').value.trim();
+    const formaPagamento = document.getElementById('formaPagamento').value;
+
+    // REMOVA A VALIDAÇÃO OBRIGATÓRIA DO CLIENTE
+    // O cliente pode ser digitado manualmente ou ficar vazio
+    // if (!cliente) {
+    //     alert("Informe o nome do cliente!");
+    //     return;
+    // }
+
+    try {
+        const response = await fetch('/venda/registrar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                cliente: cliente,  // ENVIA MESMO SE ESTIVER VAZIO
+                forma_pagamento: formaPagamento,
+                valor_total: totalVenda,
+                produtos: produtosSelecionados
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('Venda registrada com sucesso!');
+            limparVenda();
+        } else {
+            alert('Erro: ' + result.mensagem);
+        }
+    } catch (error) {
+        console.error('Erro ao finalizar venda:', error);
+        alert('Erro ao finalizar venda!');
+    }
+}
 
     // Limpar venda
     function limparVenda() {

@@ -19,9 +19,10 @@ class VendaController extends Controller
     public function registrarVenda(Request $request)
     {
         try {
+            // REMOVA A VALIDAÇÃO OBRIGATÓRIA DO cliente_nome
             $dados = $request->validate([
                 'cliente_id' => 'nullable|integer',
-                'cliente_nome' => 'required|string',
+                'cliente' => 'nullable|string',  // MUDEI PARA cliente E TORNEI OPCIONAL
                 'forma_pagamento' => 'required|string',
                 'valor_total' => 'required|numeric',
                 'produtos' => 'required|array'
@@ -29,10 +30,10 @@ class VendaController extends Controller
 
             // Registrar a venda no banco de dados
             $venda = new Venda();
-            $venda->login = $dados['cliente_nome']; // Campo no banco é "login"
+            $venda->cliente = $dados['cliente'] ?? 'Cliente não informado'; // USA cliente E DEFINE VALOR PADRÃO
             $venda->forma_pagamento = $dados['forma_pagamento'];
             $venda->valor_total = $dados['valor_total'];
-            $venda->data_venda = now(); // Campo no banco é "data_verda" - precisa ajustar
+            $venda->data_venda = now();
             $venda->save();
 
             return response()->json(['mensagem' => 'Venda registrada com sucesso!']);
