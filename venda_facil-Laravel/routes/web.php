@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\FinanceiroController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,7 +82,11 @@ Route::middleware('auth')->group(
             ->name('cadastro.clientes.store');
 
         Route::get('/buscar-cliente/{nome}', [ClienteController::class, 'buscarPorNome']);
-       
+
+
+        // Financeiro 
+        Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
+    
     }
 
 );

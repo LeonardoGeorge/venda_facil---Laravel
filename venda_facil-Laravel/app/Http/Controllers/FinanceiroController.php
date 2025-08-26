@@ -7,26 +7,34 @@ use Illuminate\Support\Facades\DB;
 
 class FinanceiroController extends Controller
 {
-    public function filtrar(Request $request)
-    {
-        $periodo = $request->query('periodo', 'diario');
+    public function index() {
+        //Resumo diario 
+        $hoje = now()->toDateString();
+        $totalDiario = DB::table('vendas')
+        ->whereDate('data_venda', $hoje)
+        ->sum('valor_total');
 
-        $query = DB::table('transacoes');
+        // Resumo semanal
+        $inicioSemana = now()->startOfWeek();
+        $fimSemana = now()->endOfWeek();
+        $totalSemanal = DB::table('vendas')
+        ->whereBetween('data_venda', [$inicioSemana, $fimSemana])
+        ->sum('valor_total');
 
-        if ($periodo === 'diario') {
-            $query->whereDate('data_venda', now()->toDateString());
-        } elseif ($periodo === 'semanal') {
-            $query->whereBetween('data_venda', [
-                now()->startOfWeek(),
-                now()->endOfWeek()
-            ]);
-        } elseif ($periodo === 'mensal') {
-            $query->whereMonth('data_venda', now()->month)
-                ->whereYear('data_venda', now()->year);
-        }
+        // REsumo mensal
+        $inicioMes = now()->startOfMonth();
+        $fimMes = now()->endOfMonth();
+        $totalMensal = DB::table('vendas')
+        ->whereBetween('data_venda', [$inicioMes, $fimMes])
+        ->sum('valor_total');
 
-        $transacoes = $query->orderBy('data_venda', 'desc')->get();
+        //Lista de vendas (últimos 50 registros)
+        $vendas = DB::table('vendas')
+        ->orderBy('data_venda', 'desc')
+        ->limit(50)
+        ->get();
 
-        return response()->json($transacoes);
+
+        return view('financeiro', compact('totalDiario', 'totalSemanal', 'totalMensal', 'vendas'));
     }
 }

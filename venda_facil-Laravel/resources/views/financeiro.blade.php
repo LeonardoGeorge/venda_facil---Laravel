@@ -177,16 +177,28 @@
             </tr>
         </tbody>
     </table>
-
     <div class="resumo">
+        <tbody id="tabelaFinanceiro">
+            @foreach($vendas as $venda)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>
+                    <td>{{ $venda->cliente }}</td>
+                    <td>{{ ucfirst($venda->forma_pagamento) }}</td>
+                    <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
+                    <td>Concluído</td>
+                </tr>
+            @endforeach
+        </tbody>
         <div class="resumo-item">
-            Total Recebido <span>R$ 5.320,00</span>
+            Hoje <span>R$ {{ number_format($totalDiario, 2, ',', '.') }}</span>
         </div>
         <div class="resumo-item">
-            Total Pendências <span>R$ 350,00</span>
+            Semana <span>R$ {{ number_format($totalSemanal, 2, ',', '.') }}</span>
+        </div>
+        <div class="resumo-item">
+            Mês <span>R$ {{ number_format($totalMensal, 2, ',', '.') }}</span>
         </div>
     </div>
-</div>
 
 <script>
 function filtrarFinanceiro() {
