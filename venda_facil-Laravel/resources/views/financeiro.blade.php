@@ -127,7 +127,7 @@
             display: block;
             font-size: 24px;
             color: #7ac943;
-        }
+        }   
 
     </style>
 </head>
@@ -166,29 +166,20 @@
                 <th>Status</th>
             </tr>
         </thead>
-        <tbody id="tabelaFinanceiro">
-            <!-- Preenchido via backend ou JS -->
-            <tr>
-                <td>2025-07-31</td>
-                <td>João da Silva</td>
-                <td>Pix</td>
-                <td>R$ 250,00</td>
-                <td>Concluído</td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="resumo">
+         <!-- Preenchido via backend ou JS -->
         <tbody id="tabelaFinanceiro">
             @foreach($vendas as $venda)
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>
-                    <td>{{ $venda->cliente }}</td>
-                    <td>{{ ucfirst($venda->forma_pagamento) }}</td>
-                    <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>                                      
+                    <td>{{ $venda->cliente }}</td>                    
+                    <td>{{ ucfirst($venda->forma_pagamento) }}</td>                    
+                    <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>                    
                     <td>Concluído</td>
                 </tr>
             @endforeach
         </tbody>
+    </table>
+    <div class="resumo">
         <div class="resumo-item">
             Hoje <span>R$ {{ number_format($totalDiario, 2, ',', '.') }}</span>
         </div>
@@ -206,9 +197,27 @@ function filtrarFinanceiro() {
     const fim = document.getElementById('dataFim').value;
     const cliente = document.getElementById('filtroCliente').value;
 
-    console.log("Filtrar por:", { inicio, fim, cliente });
+    const url = `/api/financeiro?inicio=${inicio}&fim=${fim}&cliente=${cliente}`;
 
-    // Aqui você faria a chamada para seu backend Laravel (ex: /api/financeiro?inicio=...&fim=...)
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('tabelaFinanceiro');
+            tbody.innerHTML = '';
+
+            data.forEach(venda => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${new Date(venda.data_venda).toLocaleDateString('pt-BR')}</td>
+                        <td>${venda.cliente}</td>
+                        <td>${venda.forma_pagamento}</td>
+                        <td>R$ ${parseFloat(venda.valor_total).toFixed(2).replace('.', ',')}</td>
+                        <td>Concluído</td>
+                    </tr>
+                `;
+            });
+        });
+        
 }
 </script>
 
