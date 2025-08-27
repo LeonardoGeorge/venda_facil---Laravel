@@ -25,6 +25,7 @@
         .logo {
             font-size: 24px;
             font-weight: bold;
+            
         }
 
         .logo span {
@@ -33,6 +34,7 @@
             padding: 2px 6px;
             border-radius: 3px;
             margin-left: 4px;
+            
         }
 
         .menu {
@@ -134,7 +136,7 @@
 <body>
 
 <header class="top-bar">
-    <div class="logo"><a href="http://localhost:8000/" style="color: white;">Venda<span>FACIL</span></a></div>
+    <div class="logo"><a href="http://localhost:8000/" style="color: white; text-decoration: none;">Venda<span>FACIL</span></a></div>
     <nav>
         <ul class="menu">
             <li><a href="http://localhost:8000/venda">Vendas</a></li>

@@ -50,5 +50,27 @@ class ProdutoController extends Controller
             'fornecedor' => $produto->fornecedor
         ]);
     }
-    
+
+    public function edit($id) 
+    {
+        $produto = Produto::findOrFail($id);
+        return view('editar-produto', compact('produto'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $produto = Produto::findOrFail($id);
+
+        $produto->update([
+            'nome_produto' => $request->nome_produto,
+            'categoria' => $request->categoria,
+            'preco_entrada' => $request->preco_entrada,
+            'preco_saida' => $request->preco_saida,
+            'quantidade' => $request->quantidade,
+            'fornecedor' => $request->fornecedor,
+        ]);
+
+        return redirect()->route('produtos.index')->with('success', 'Produto atualizado com sucesso!');
+    }
+
 }

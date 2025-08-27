@@ -61,6 +61,10 @@ Route::middleware('auth')->group(
             return view('cadastro');
         })->name('cadastro');
 
+        Route::get('/produtos', [ProdutoController::class, 'index'])->name('produtos.index');
+        Route::get('/produtos/{id}/editar', [ProdutoController::class, 'edit'])->name('produtos.edit');
+        Route::post('/produtos/{id}/editar', [ProdutoController::class, 'update'])->name('produtos.update');
+
         // Rota para MOSTRAR o formulário (GET)
         Route::get('/cadastro-produtos', [ProdutoController::class, 'create'])
         ->name('cadastro.produtos.form');
