@@ -358,6 +358,8 @@
         }
     }
 
+   
+
     // CORREÇÃO DA SELEÇÃO DE CLIENTE
 function selecionarCliente(id, nome) {
     clienteSelecionado = id;
@@ -412,6 +414,9 @@ if (resultadoCliente) {
             return;
         }
 
+         // Deduzir do banco imediatamente
+        await atualizarEstoque(produto.id, quantidade);
+
         // Adicionar produto à lista
         produtosSelecionados.push({
             id: produto.id,
@@ -440,6 +445,7 @@ if (resultadoCliente) {
         document.getElementById('valorTotal').value = '';
         document.getElementById('codigo').focus();
     }
+
 
     // CORREÇÃO: Buscar cliente em tempo real
     document.getElementById('cliente').addEventListener('input', async function(){
@@ -490,32 +496,29 @@ if (resultadoCliente) {
     const cliente = document.getElementById('cliente').value.trim();
     const formaPagamento = document.getElementById('formaPagamento').value;
 
-    // REMOVA A VALIDAÇÃO OBRIGATÓRIA DO CLIENTE
-    // O cliente pode ser digitado manualmente ou ficar vazio
-    // if (!cliente) {
-    //     alert("Informe o nome do cliente!");
-    //     return;
-    // }
-
     try {
-        const response = await fetch('/venda/registrar', {
+        const response = await fetch('/venda/finalizar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify({
-                cliente: cliente,  // ENVIA MESMO SE ESTIVER VAZIO
+                cliente: cliente,
                 forma_pagamento: formaPagamento,
-                valor_total: totalVenda,
-                produtos: produtosSelecionados
+                total: totalVenda,
+                itens: produtosSelecionados.map(item => ({
+                    produto_id: item.id,
+                    quantidade: item.quantidade,
+                    preco: item.preco_unitario
+                }))
             })
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            alert('Venda registrada com sucesso!');
+            alert('Venda registrada e estoque atualizado com sucesso!');
             limparVenda();
         } else {
             alert('Erro: ' + result.mensagem);
@@ -562,6 +565,33 @@ if (resultadoCliente) {
             document.getElementById('resultadoCliente').style.display = 'none';
         }
     });
+
+    async function atualizarEstoque(produtoId, quantidade) {
+        try {
+            const response = await fetch('/api/produtos/deduzir-estoque', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    produto_id: produtoId,
+                    quantidade: quantidade
+                })
+            });
+
+            const result = await response.json();
+
+            if(!response.ok) {
+                console.error("Erro ao atualizar estoque:", result.mensagem || result);
+                alert("Não foi possível atualizar o estoque deste item.");
+            }
+        } catch (error) {
+            console.error("Erro ao conectar API de estoque:", error);
+        }
+    }
+
+
 </script>
 
 </body>

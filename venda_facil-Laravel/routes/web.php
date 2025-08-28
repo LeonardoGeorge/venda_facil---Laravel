@@ -55,6 +55,12 @@ Route::middleware('auth')->group(
         // Rotas para vendas
         Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
         Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
+
+        // Deduzir quantidado do estoque
+        Route::post('/venda/finalizar', [VendaController::class, 'finalizarVenda']);
+
+        
+        // Buscar produto
         Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
         Route::get('/cadastro', function () {
@@ -64,6 +70,8 @@ Route::middleware('auth')->group(
         Route::get('/produtos', [ProdutoController::class, 'index'])->name('produtos.index');
         Route::get('/produtos/{id}/editar', [ProdutoController::class, 'edit'])->name('produtos.edit');
         Route::post('/produtos/{id}/editar', [ProdutoController::class, 'update'])->name('produtos.update');
+        
+
 
         // Rota para MOSTRAR o formulário (GET)
         Route::get('/cadastro-produtos', [ProdutoController::class, 'create'])

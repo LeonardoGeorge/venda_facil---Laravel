@@ -62,4 +62,55 @@ class VendaController extends Controller
             'fornecedor' => $produto->fornecedor
         ]);
     }
+    //  Finalizar e deduzir estoque no bd
+    public function finalizarVenda(Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                // Criar venda (usando a estrutura da sua tabela vendas)
+                $venda = Venda::create([
+                    'cliente' => $request->cliente ?? 'Cliente não informado',
+                    'forma_pagamento' => $request->forma_pagamento,
+                    'valor_total' => $request->total,
+                    'data_venda' => now()
+                ]);
+
+                // Percorre cada item da venda
+                foreach ($request->itens as $item) {
+                    // Calcular subtotal
+                    $subtotal = $item['quantidade'] * $item['preco'];
+
+                    // Registrar na tabela venda_produtos
+                    VendaProduto::create([
+                        'venda_id' => $venda->id,
+                        'produto_id' => $item['produto_id'],
+                        'quantidade' => $item['quantidade'],
+                        'preco_unitario' => $item['preco'],
+                        'subtotal' => $subtotal
+                    ]);
+
+                    // Atualiza estoque na tabela produtos
+                    $produto = Produto::find($item['produto_id']);
+
+                    if (!$produto) {
+                        throw new \Exception("Produto ID {$item['produto_id']} não encontrado");
+                    }
+
+                    if ($produto->quantidade < $item['quantidade']) {
+                        throw new \Exception("Estoque insuficiente para o produto {$produto->nome_produto}");
+                    }
+
+                    // 🔥 DEDUZINDO O ESTOQUE - campo 'quantidade' na tabela produtos
+                    $produto->quantidade -= $item['quantidade'];
+                    $produto->save();
+                }
+            });
+
+            return response()->json(['mensagem' => 'Venda finalizada e estoque atualizado com sucesso!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'mensagem' => 'Erro ao finalizar venda: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

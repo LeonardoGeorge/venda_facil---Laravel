@@ -32,4 +32,10 @@ class Produto extends Model
     {
         return $this->hasMany(VendaProduto::class);
     }
+    // Produto.php
+    public function deduzirEstoque($quantidade)
+    {
+        $this->estoque -= $quantidade;
+        $this->save();
+    }
 }
