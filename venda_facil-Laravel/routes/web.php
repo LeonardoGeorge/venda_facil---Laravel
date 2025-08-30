@@ -6,6 +6,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\VendaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\FinanceiroController;
+use App\Http\Controllers\FornecedorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,7 +108,13 @@ Route::middleware('auth')->group(
         // Financeiro Filtrar
         Route::get('/financeiro/filtrar', [FinanceiroController::class, 'filtrar'])->name('financeiro.filtrar');
 
-        
+        // Rotas para fornecedores
+        Route::get('/fornecedores', [FornecedorController::class, 'index'])->name('fornecedores.index');
+        Route::get('/cadastro-fornecedores', [FornecedorController::class, 'create'])->name('fornecedores.create');
+        Route::post('/cadastro-fornecedores', [FornecedorController::class, 'store'])->name('fornecedores.store');
+        Route::get('/fornecedores/{id}/editar', [FornecedorController::class, 'edit'])->name('fornecedores.edit');
+        Route::put('/fornecedores/{id}', [FornecedorController::class, 'update'])->name('fornecedores.update');
+        Route::delete('/fornecedores/{id}', [FornecedorController::class, 'destroy'])->name('fornecedores.destroy');
     
     }
 
