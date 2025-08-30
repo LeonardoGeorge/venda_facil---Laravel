@@ -103,10 +103,11 @@
 <header>
     <h1>Venda <span>FÁCIL</span></h1>
     <nav>
+        <a href="http://localhost:8000/">Início</a>
         <a href="http://localhost:8000/venda">Vendas</a>
-            <a href="http://localhost:8000/cadastro">Cadastro</a>
-            <a href="http://localhost:8000/produtos">Produtos</a>
-            
+        <a href="http://localhost:8000/clientes">Clientes</a>
+        <a href="http://localhost:8000/produtos">Produtos</a>
+        <a href="http://localhost:8000/fornecedores">Fornecedores</a>
     </nav>
 </header>
 

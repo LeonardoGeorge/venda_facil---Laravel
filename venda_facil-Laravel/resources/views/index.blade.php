@@ -120,14 +120,15 @@ a {
 
 .section-cards {
   background: #000000;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 40px;
+  display:flex;
+  justify-content:center;
+  gap: 15px;
+  padding: 30px;
 }
 
 .card {
   background: white;
+  width: 280px;
   padding: 20px;
   border-radius: 8px;
   color: white;
@@ -144,7 +145,7 @@ a {
 }
 
 .card ul li {
-  margin: 10px 0;
+  margin: 6px 0;
 }
 
 .card button {
@@ -154,6 +155,7 @@ a {
   padding: 8px 12px;
   margin-top: 10px;
   cursor: pointer;
+  border-radius:5px;
   font-weight: bold;
 }
 
@@ -184,7 +186,7 @@ a {
             <li><a href="http://localhost:8000/cliente">Clientes</a></li>
             <li><a href="http://localhost:8000/produtos">Produtos</a></li>
             <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
-            
+            <li><a href="http://localhost:8000/fornecedores">Fornecedores</a></li> 
         </ul>
     </nav>
     <div class="auth-buttons">
@@ -233,7 +235,7 @@ a {
       <li>✅ Informações</li>
       <li>✅ Marketing</li>
     </ul>
-    <button>Comece a divulgar</button>
+    <button><a href="http://localhost:8000/cliente">Comece a divulgar</button>
   </div>
 
   <div class="card blue">
@@ -243,7 +245,7 @@ a {
       <li>✅ Meios de pagamento</li>
       <li>✅ Fluxo de caixa</li>
     </ul>
-    <button>Comece a se organizar</button>
+    <button><a href="http://localhost:8000/financeiro">Comece a se organizar</button>
   </div>
 </main>
 

@@ -155,12 +155,12 @@ a {
     <div class="logo"><a href="http://localhost:8000/">Venda<span>FACIL</span></a></div>
     <nav>
         <ul class="menu">
-            <li><a href="http://localhost:8000/venda">Vendas</a></li>
-            <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-            <li><a href="http://localhost:8000/cliente">Clientes</a></li>
-            <li><a href="http://localhost:8000/produtos">Produtos</a></li>
-            <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
-            
+            <a href="http://localhost:8000/venda">Vendas</a>
+            <a href="http://localhost:8000/cadastro">Cadastro</a>
+            <a href="http://localhost:8000/cliente">Clientes</a>
+            <a href="http://localhost:8000/produtos">Produtos</a>
+            <a href="http://localhost:8000/financeiro">Financeiro</a>
+            <a href="http://localhost:8000/fornecedores">Fornecedores</a>            
         </ul>
     </nav>
     <div class="auth-buttons">
