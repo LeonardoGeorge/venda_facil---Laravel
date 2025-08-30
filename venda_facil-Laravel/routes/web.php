@@ -101,6 +101,10 @@ Route::middleware('auth')->group(
 
         // Financeiro Filtrar
         Route::get('/financeiro/filtrar', [FinanceiroController::class, 'filtrar'])->name('financeiro.filtrar');
+
+        // Clientes area
+        Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+    
     }
 
 );

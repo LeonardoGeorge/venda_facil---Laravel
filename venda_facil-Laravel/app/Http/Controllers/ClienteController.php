@@ -23,7 +23,7 @@ class ClienteController extends Controller
         $request->validate([
             'nome' => 'required|string|max:255',
             'telefone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'email' => 'nullable|email|max:255',"
             'cpf' => 'required|string|max:14|unique:clientes',
         ]);
 
