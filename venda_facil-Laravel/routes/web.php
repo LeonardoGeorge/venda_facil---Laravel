@@ -35,10 +35,6 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
-// Dashboard (se ainda quiser mantê-la)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Rotas protegidas
 Route::middleware('auth')->group(
@@ -81,7 +77,7 @@ Route::middleware('auth')->group(
         Route::post('/cadastro-produtos', [ProdutoController::class, 'store'])
         ->name('cadastro.produtos.store');
 
-        // Ou use resource (recomendado)
+        // Resource 
         Route::resource('produtos', ProdutoController::class);
 
         Route::get('/clientes', [ClienteController::class, 'index'])
@@ -95,6 +91,15 @@ Route::middleware('auth')->group(
 
         Route::get('/buscar-cliente/{nome}', [ClienteController::class, 'buscarPorNome']);
 
+        // Rotas para edição de clientes
+        Route::get('/clientes/{id}/editar', [ClienteController::class, 'edit'])
+            ->name('clientes.edit');
+
+        Route::post('/clientes/{id}/editar', [ClienteController::class, 'update'])
+            ->name('clientes.update');
+
+        Route::get('/buscar-cliente/{nome}', [ClienteController::class, 'buscarPorNome']);
+
 
         // Financeiro 
         Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
@@ -102,8 +107,7 @@ Route::middleware('auth')->group(
         // Financeiro Filtrar
         Route::get('/financeiro/filtrar', [FinanceiroController::class, 'filtrar'])->name('financeiro.filtrar');
 
-        // Clientes area
-        Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+        
     
     }
 
