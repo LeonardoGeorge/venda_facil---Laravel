@@ -170,7 +170,7 @@
             <li><a href="http://localhost:8000/cliente">Clientes</a></li>
             <li><a href="http://localhost:8000/produtos">Produtos</a></li>
             <li><a href="http://localhost:8000/finaceiro">Financeiro</a></li>
-            <li><a href="http://localhost:8000/estoque">Estoque</a></li>
+            
         </ul>
     </nav>
    

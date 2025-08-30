@@ -80,7 +80,7 @@ Route::middleware('auth')->group(
         // Resource 
         Route::resource('produtos', ProdutoController::class);
 
-        Route::get('/clientes', [ClienteController::class, 'index'])
+        Route::get('/cliente', [ClienteController::class, 'index'])
             ->name('clientes.index');
 
         Route::get('/cadastro-clientes', [ClienteController::class, 'create'])
