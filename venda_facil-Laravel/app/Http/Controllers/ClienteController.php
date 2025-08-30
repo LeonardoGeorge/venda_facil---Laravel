@@ -23,8 +23,9 @@ class ClienteController extends Controller
         $request->validate([
             'nome' => 'required|string|max:255',
             'telefone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',"
+            'email' => 'nullable|email|max:255',
             'cpf' => 'required|string|max:14|unique:clientes',
+            'endereco' => 'nullable|string|max:500', // Adicionei o endereço
         ]);
 
         Cliente::create($request->all());
@@ -32,9 +33,32 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index')->with('success', 'Cliente cadastrado com sucesso!');
     }
 
+    // Adicione estes métodos para edição
+    public function edit($id)
+    {
+        $cliente = Cliente::findOrFail($id);
+        return view('editar-cliente', compact('cliente'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'telefone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'cpf' => 'required|string|max:14|unique:clientes,cpf,' . $id,
+            'endereco' => 'nullable|string|max:500',
+        ]);
+
+        $cliente = Cliente::findOrFail($id);
+        $cliente->update($request->all());
+
+        return redirect()->route('clientes.index')->with('success', 'Cliente atualizado com sucesso!');
+    }
+
     public function buscarPorNome($nome)
     {
-        $cliente = \App\Models\Cliente::where('nome', 'ilike', "%{$nome}%")->first();
+        $cliente = Cliente::where('nome', 'ilike', "%{$nome}%")->first();
 
         if (!$cliente) {
             return response()->json(['erro' => 'Cliente não encontrado'], 404);
