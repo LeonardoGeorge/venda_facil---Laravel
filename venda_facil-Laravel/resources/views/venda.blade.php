@@ -5,8 +5,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sistema de Vendas - Supermercado</title>
-    <link rel="stylesheet" href="style.css">
-    
     <style>
     body {
         margin: 0;
@@ -499,7 +497,7 @@
         if (produto && produto.preco_saida) {
             document.getElementById('valorUnitario').value = formatarNumero(produto.preco_saida);
             // Preenche também o campo código normal se necessário
-            document.getElementById('codigo').value = produto.codigo || '';
+            document.getElementById('codigo').value = produto.codigo || produto.id || '';
             atualizarValorTotal();
         } else {
             alert('Produto não encontrado pelo código de barras');

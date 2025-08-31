@@ -77,11 +77,18 @@ class ProdutoController extends Controller
     {
         Log::info("=== BUSCANDO PRODUTO POR CÓDIGO DE BARRAS: $codigoBarras ===");
 
-        $produto = Produto::where('codigo_barras', $codigoBarras)->first();
+        // Tente diferentes nomes de coluna possíveis
+        $produto = Produto::where('codigo_barras', $codigoBarras)
+            ->orWhere('codigo_barras', $codigoBarras) // com 's'
+            ->orWhere('codigo_barras', $codigoBarras) // sem 's'
+            ->first();
 
         if (!$produto) {
+            Log::error("Produto não encontrado para código de barras: $codigoBarras");
             return response()->json(['erro' => 'Produto não encontrado'], 404);
         }
+
+        Log::info("Produto encontrado: " . $produto->nome_produto);
 
         return response()->json([
             'id' => $produto->id,
@@ -90,8 +97,8 @@ class ProdutoController extends Controller
             'quantidade' => $produto->quantidade,
             'categoria' => $produto->categoria,
             'fornecedor' => $produto->fornecedor,
-            'codigo' => $produto->id, // Para compatibilidade com o código existente
-            'codigo_barras' => $produto->codigo_barras
+            'codigo' => $produto->id,
+            'codigo_barras' => $produto->codigo_barras // Use o nome correto da coluna
         ]);
     }
 

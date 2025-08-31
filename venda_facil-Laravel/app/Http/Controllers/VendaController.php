@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Venda;
 use App\Models\Produto;
-use App\Models\VendaProduto; // Importar o novo model
+use App\Models\VendaProduto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class VendaController extends Controller
 {
@@ -45,8 +46,11 @@ class VendaController extends Controller
         }
     }
 
+    // Buscar produto por ID
     public function buscarProduto($id)
     {
+        Log::info("=== BUSCANDO PRODUTO POR ID: $id ===");
+
         $produto = Produto::find($id);
 
         if (!$produto) {
@@ -59,9 +63,48 @@ class VendaController extends Controller
             'preco_saida' => $produto->preco_saida,
             'quantidade' => $produto->quantidade,
             'categoria' => $produto->categoria,
-            'fornecedor' => $produto->fornecedor
+            'fornecedor' => $produto->fornecedor,
+            'codigo_barras' => $produto->codigo_barras // Adicionado para compatibilidade
         ]);
     }
+
+    // Buscar produto por código de barras
+    public function buscarProdutoPorCodigoBarras($codigoBarras)
+    {
+        Log::info("=== BUSCANDO PRODUTO POR CÓDIGO DE BARRAS: $codigoBarras ===");
+
+        // Busca pelo código de barras
+        $produto = Produto::where('codigo_barras', $codigoBarras)->first();
+
+        if (!$produto) {
+            Log::error("Produto não encontrado para código de barras: $codigoBarras");
+
+            // Tentativa alternativa: verificar se há espaços ou caracteres especiais
+            $codigoLimpo = preg_replace('/[^0-9]/', '', $codigoBarras);
+            if ($codigoLimpo !== $codigoBarras) {
+                Log::info("Tentando busca com código limpo: $codigoLimpo");
+                $produto = Produto::where('codigo_barras', $codigoLimpo)->first();
+            }
+
+            if (!$produto) {
+                return response()->json(['erro' => 'Produto não encontrado'], 404);
+            }
+        }
+
+        Log::info("Produto encontrado: " . $produto->nome_produto);
+
+        return response()->json([
+            'id' => $produto->id,
+            'nome_produto' => $produto->nome_produto,
+            'preco_saida' => $produto->preco_saida,
+            'quantidade' => $produto->quantidade,
+            'categoria' => $produto->categoria,
+            'fornecedor' => $produto->fornecedor,
+            'codigo' => $produto->id,
+            'codigo_barras' => $produto->codigo_barras
+        ]);
+    }
+
     //  Finalizar e deduzir estoque no bd
     public function finalizarVenda(Request $request)
     {
@@ -112,5 +155,15 @@ class VendaController extends Controller
                 'mensagem' => 'Erro ao finalizar venda: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // Método adicional para debug - listar todos os produtos com código de barras
+    public function debugCodigosBarras()
+    {
+        $produtosComCodigo = Produto::whereNotNull('codigo_barras')
+            ->where('codigo_barras', '!=', '')
+            ->get(['id', 'nome_produto', 'codigo_barras']);
+
+        return response()->json($produtosComCodigo);
     }
 }

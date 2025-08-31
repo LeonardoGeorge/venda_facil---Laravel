@@ -53,17 +53,18 @@ Route::middleware('auth')->group(
         Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
         Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
 
+        //Buscar prod. por Cod_barras
+        Route::get('/api/produtos/codigo-barras/{codigoBarras}', [VendaController::class, 'buscarProdutoPorCodigoBarras']);
+
         // Deduzir quantidado do estoque
         Route::post('/venda/finalizar', [VendaController::class, 'finalizarVenda']);
 
-
         
-        // Buscar produto por código
+        // Buscar produto
         Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
-        // Buscar produto por código de barras 
+        // Buscar produto por código de barras (ADICIONE ESTA LINHA)
         Route::get('/api/produtos/codigo-barras/{codigoBarras}', [ProdutoController::class, 'buscarPorCodigoBarras']);
-        Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
         Route::get('/cadastro', function () {
             return view('cadastro');
