@@ -242,6 +242,11 @@
                     <input type="text" id="codigo" placeholder="Digite o código">
                 </div>
                 <div class="input-group">
+                    <label>Leitor de Códigos (via Câmera)</label>
+                    <div id="leitor-barcode" style="width: 400px; height: 300px; border:1px solid #ccc;"></div>
+                    <button type="button" onclick="iniciarScanner()">Ativar Câmera</button>
+                </div>
+                <div class="input-group">
                     <label>Produto</label>
                 </div>
                 <div class="input-group">
@@ -590,9 +595,51 @@ if (resultadoCliente) {
             console.error("Erro ao conectar API de estoque:", error);
         }
     }
+    function iniciarScanner() {
+    Quagga.init({
+        inputStream: {
+            type: "LiveStream",
+            target: document.querySelector('#leitor-barcode'),
+            constraints: {
+                width: 400,
+                height: 300,
+                facingMode: "environment" 
+            }
+        },
+        decoder: {
+            readers: ["ean_reader", "code_128_reader", "upc_reader"] // tipos de código
+        }
+    }, function(err) {
+        if (err) {
+            console.error(err);
+            alert("Erro ao iniciar câmera");
+            return;
+        }
+        Quagga.start();
+    });
+
+    // Quando encontrar um código de barras
+    Quagga.onDetected(function(data) {
+        let codigo = data.codeResult.code;
+        console.log("Código detectado:", codigo);
+
+        // Preenche o campo código
+        document.getElementById('codigo').value = codigo;
+
+        // Simula que o usuário saiu do campo → busca produto
+        document.getElementById('codigo').dispatchEvent(new Event('blur'));
+
+        // Para o scanner depois de ler (opcional)
+        Quagga.stop();
+    });
+}
+
 
 
 </script>
+
+<!-- Biblioteca QuaggaJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 
 </body>
 </html>
