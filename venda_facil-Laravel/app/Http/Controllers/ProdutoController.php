@@ -25,6 +25,7 @@ class ProdutoController extends Controller
         $produto->preco_saida = $request->input('preco_saida');
         $produto->quantidade = $request->input('quantidade');
         $produto->fornecedor = $request->input('fornecedor');
+        $produto->codigo_barras = $request->input('codigo_barras');
         $produto->save();
 
         return redirect()->route('produtos.index')->with('success', 'Produto cadastrado com sucesso!');

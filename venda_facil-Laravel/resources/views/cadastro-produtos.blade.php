@@ -161,6 +161,11 @@
                 <label>Nome do Produto:</label>
                 <input type="text" name="nome_produto" required>
 
+                <label for="codigo_barras">Código de Barras:</label>
+                <input type="text" id="codigo_barras" name="codigo_barras" required>
+                <div id="camera" style="width: 400px; height: 300px; border: 1px solid #ccc;"></div>
+                <button type="button" id="iniciarCamera">Ler Código de Barras</button>
+
                 <label>Categoria:</label>
                 <input type="text" name="categoria" required>
 
@@ -184,5 +189,44 @@
     <footer>
         <p>Sistema VendaFácil &copy; 2023</p>
     </footer>
+<script>
+document.getElementById('iniciarCamera').addEventListener('click', function() {
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#camera'),
+            constraints: {
+                facingMode: "environment" // traseira no celular, webcam no PC
+            },
+        },
+        decoder: {
+            readers: ["ean_reader", "code_128_reader"] // Tipos comuns de códigos
+        },
+    }, function(err) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log("Câmera iniciada");
+        Quagga.start();
+    });
+
+    // Quando detectar código
+    Quagga.onDetected(function(result) {
+        var code = result.codeResult.code;
+        console.log("Código detectado: " + code);
+
+        // Preenche o input automaticamente
+        document.getElementById('codigo_barras').value = code;
+
+        // Para a leitura (opcional, para não ficar repetindo)
+        Quagga.stop();
+    });
+});
+</script>
+
+<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+
 </body>
 </html>

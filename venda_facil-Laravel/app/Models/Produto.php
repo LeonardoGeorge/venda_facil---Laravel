@@ -14,6 +14,7 @@ class Produto extends Model
             'preco_saida',
             'quantidade',
             'fornecedor',
+            'codigo_barras',
     ];
     protected $casts = [
         'preco' => 'decimal:2',
