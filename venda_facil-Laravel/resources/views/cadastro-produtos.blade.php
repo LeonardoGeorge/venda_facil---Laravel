@@ -71,6 +71,30 @@
           font-weight: bold;
         }
 
+        #camera {
+          position: relative;
+          width: 300px;
+          height: 200px;
+          border: 1px solid #ccc;
+          overflow: hidden; /* garante que não ultrapasse */
+        }
+
+        #camera video {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover; /* corta e preenche */
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+        #camera canvas {
+          width: 100% !important;
+          height: 100% !important;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+
         form input, form select {
           width: 100%;
           padding: 10px;
@@ -163,9 +187,10 @@
 
                 <label for="codigo_barras">Código de Barras:</label>
                 <input type="text" id="codigo_barras" name="codigo_barras" required>
-                <div id="camera" style="width: 400px; height: 300px; border: 1px solid #ccc;"></div>
+                <div id="camera" style="width: 300px; height: 200px; border: 1px solid #ccc;"></div>
+                <br>
                 <button type="button" id="iniciarCamera">Ler Código de Barras</button>
-
+                <br>
                 <label>Categoria:</label>
                 <input type="text" name="categoria" required>
 
