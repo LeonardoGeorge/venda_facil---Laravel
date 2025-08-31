@@ -56,8 +56,13 @@ Route::middleware('auth')->group(
         // Deduzir quantidado do estoque
         Route::post('/venda/finalizar', [VendaController::class, 'finalizarVenda']);
 
+
         
-        // Buscar produto
+        // Buscar produto por código
+        Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
+
+        // Buscar produto por código de barras 
+        Route::get('/api/produtos/codigo-barras/{codigoBarras}', [ProdutoController::class, 'buscarPorCodigoBarras']);
         Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
         Route::get('/cadastro', function () {

@@ -73,6 +73,27 @@ class ProdutoController extends Controller
 
         return redirect()->route('produtos.index')->with('success', 'Produto atualizado com sucesso!');
     }
+    public function buscarPorCodigoBarras($codigoBarras)
+    {
+        Log::info("=== BUSCANDO PRODUTO POR CÓDIGO DE BARRAS: $codigoBarras ===");
+
+        $produto = Produto::where('codigo_barras', $codigoBarras)->first();
+
+        if (!$produto) {
+            return response()->json(['erro' => 'Produto não encontrado'], 404);
+        }
+
+        return response()->json([
+            'id' => $produto->id,
+            'nome_produto' => $produto->nome_produto,
+            'preco_saida' => $produto->preco_saida,
+            'quantidade' => $produto->quantidade,
+            'categoria' => $produto->categoria,
+            'fornecedor' => $produto->fornecedor,
+            'codigo' => $produto->id, // Para compatibilidade com o código existente
+            'codigo_barras' => $produto->codigo_barras
+        ]);
+    }
 
     
 }
