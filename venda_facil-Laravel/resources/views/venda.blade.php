@@ -739,7 +739,7 @@
                 }
             },
             decoder: {
-                readers: ["ean_reader", "code_128_reader", "upc_reader"]
+                readers: ["ean_reader"]
             }
         }, function(err) {
             if (err) {
@@ -754,6 +754,12 @@
         // Quando encontrar um código de barras
         Quagga.onDetected(function(data) {
             let codigoBarras = data.codeResult.code;
+
+            if (!/^\d{13}$/.test(codigoBarras)) {
+                console.log("Ignorado: código inválido ->", codigoBarras);
+                return;
+            }
+
             console.log("Código de barras detectado:", codigoBarras);
 
             // Preenche o campo código de barras
