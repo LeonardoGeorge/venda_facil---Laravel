@@ -756,9 +756,9 @@
             let codigoBarras = data.codeResult.code;
 
             if (!/^\d{13}$/.test(codigoBarras)) {
-                console.log("Ignorado: código inválido ->", codigoBarras);
-                return;
-            }
+            console.log("Ignorado: código inválido ->", codigoBarras);
+            return;
+        }
 
             console.log("Código de barras detectado:", codigoBarras);
 
