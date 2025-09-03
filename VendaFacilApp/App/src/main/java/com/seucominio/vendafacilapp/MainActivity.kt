@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
     private val CAMERA_REQ_CODE = 1001
-    private val APP_URL = "https://venda-facil-1234.ngrok-free.app" // Troque pela sua URL
+    private val APP_URL = "https://7ec87d31c61c.ngrok-free.app" // Troque pela sua URL
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
