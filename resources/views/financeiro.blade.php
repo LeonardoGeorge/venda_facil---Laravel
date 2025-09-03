@@ -183,13 +183,13 @@
     </table>
     <div class="resumo">
         <div class="resumo-item">
-            Hoje <span>R$ {{ number_format($totalDiario, 2, ',', '.') }}</span>
+            Período Selecionado <span id="totalPeriodo">R$ 0,00</span>
         </div>
         <div class="resumo-item">
-            Semana <span>R$ {{ number_format($totalSemanal, 2, ',', '.') }}</span>
+            Média por Dia <span id="mediaDiaria">R$ 0,00</span>
         </div>
         <div class="resumo-item">
-            Mês <span>R$ {{ number_format($totalMensal, 2, ',', '.') }}</span>
+            Total de Vendas <span id="totalVendas">0</span>
         </div>
     </div>
 
@@ -206,20 +206,67 @@ function filtrarFinanceiro() {
         .then(data => {
             const tbody = document.getElementById('tabelaFinanceiro');
             tbody.innerHTML = '';
-
+            
+            let totalPeriodo = 0;
+            let totalVendas = 0;
+            
+            // Calcular totais baseados no período filtrado
             data.forEach(venda => {
+                const valorVenda = parseFloat(venda.valor_total);
+                totalPeriodo += valorVenda;
+                totalVendas++;
+                
                 tbody.innerHTML += `
                     <tr>
                         <td>${new Date(venda.data_venda).toLocaleDateString('pt-BR')}</td>
                         <td>${venda.cliente}</td>
                         <td>${venda.forma_pagamento}</td>
-                        <td>R$ ${parseFloat(venda.valor_total).toFixed(2).replace('.', ',')}</td>
+                        <td>R$ ${valorVenda.toFixed(2).replace('.', ',')}</td>
                         <td>Concluído</td>
                     </tr>
                 `;
             });
+            
+            // Calcular média diária
+            let mediaDiaria = 0;
+            if (inicio && fim && data.length > 0) {
+                const dataInicio = new Date(inicio);
+                const dataFim = new Date(fim);
+                const diffTime = Math.abs(dataFim - dataInicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir ambos os dias
+                mediaDiaria = totalPeriodo / diffDays;
+            }
+
+            // Atualizar os totais no resumo
+            document.getElementById('totalPeriodo').textContent = 
+                'R$ ' + totalPeriodo.toFixed(2).replace('.', ',');
+            document.getElementById('mediaDiaria').textContent = 
+                'R$ ' + mediaDiaria.toFixed(2).replace('.', ',');
+            document.getElementById('totalVendas').textContent = totalVendas;
+        })
+        .catch(error => {
+            console.error('Erro ao filtrar dados:', error);
         });
-        
+}
+
+// Inicializar campos de data com valores padrão
+window.onload = function() {
+    const hoje = new Date();
+    const seteDiasAtras = new Date();
+    seteDiasAtras.setDate(hoje.getDate() - 7);
+    
+    document.getElementById('dataInicio').value = formatDate(seteDiasAtras);
+    document.getElementById('dataFim').value = formatDate(hoje);
+    
+    // Carregar dados iniciais
+    filtrarFinanceiro();
+};
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 </script>
 
