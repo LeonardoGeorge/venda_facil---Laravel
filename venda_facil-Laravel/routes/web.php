@@ -121,8 +121,13 @@ Route::middleware('auth')->group(
         Route::get('/fornecedores/{id}/editar', [FornecedorController::class, 'edit'])->name('fornecedores.edit');
         Route::put('/fornecedores/{id}', [FornecedorController::class, 'update'])->name('fornecedores.update');
         Route::delete('/fornecedores/{id}', [FornecedorController::class, 'destroy'])->name('fornecedores.destroy');
+
+    
+    
+    
     
     }
+    
 
 );
 
