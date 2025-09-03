@@ -1,4 +1,4 @@
-package com.seudominio.vendafacilapp
+package com.seu.pacote.vendafacilapp
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -10,127 +10,71 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
-    private lateinit var progressBar: ProgressBar
     private val CAMERA_REQ_CODE = 1001
-    private val APP_URL = "https://7ec87d31c61c.ngrok-free.app" // Troque pela sua URL
+
+    private val APP_URL = "https://ab5d2fed7d38.ngrok-free.app" // <-- troque pela sua URL https do ngrok
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        // Pede permissão de câmera em tempo de execução (Android 6+)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_REQ_CODE
+            )
         }
 
-        // Verificar e solicitar permissões
-        if (!hasCameraPermission()) {
-            requestCameraPermission()
-        }
-
-        setupWebView()
-    }
-
-    private fun hasCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this, 
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.CAMERA),
-            CAMERA_REQ_CODE
-        )
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun setupWebView() {
         webView = findViewById(R.id.webview)
-        progressBar = findViewById(R.id.progressBar)
 
+        // Configurações do WebView
         with(webView.settings) {
             javaScriptEnabled = true
             domStorageEnabled = true
             databaseEnabled = true
-            mediaPlaybackRequiresUserGesture = false
-            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            mediaPlaybackRequiresUserGesture = true
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW // segurança + compat
+            // melhora de performance
             cacheMode = WebSettings.LOAD_DEFAULT
             loadsImagesAutomatically = true
             useWideViewPort = true
-            loadWithOverviewMode = true
-            setSupportZoom(true)
-            builtInZoomControls = true
-            displayZoomControls = false
         }
 
-        webView.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                progressBar.visibility = ProgressBar.GONE
-            }
-        }
+        // Mantém a navegação dentro do app
+        webView.webViewClient = object : WebViewClient() {}
 
+        // Libera permissões WebRTC (câmera) solicitadas pela página (Quagga/getUserMedia)
         webView.webChromeClient = object : WebChromeClient() {
-            override fun onPermissionRequest(request: PermissionRequest) {
+            override fun onPermissionRequest(request: PermissionRequest?) {
                 runOnUiThread {
-                    // Concede todas as permissões solicitadas (câmera, áudio, etc.)
+                    if (request == null) return@runOnUiThread
+                    // Concede as permissões pedidas pela página (video/audio se necessário)
                     request.grant(request.resources)
                 }
             }
-            
-            override fun onProgressChanged(view: WebView, newProgress: Int) {
-                if (newProgress < 100) {
-                    progressBar.visibility = ProgressBar.VISIBLE
-                } else {
-                    progressBar.visibility = ProgressBar.GONE
-                }
-            }
         }
 
-        // Carrega a aplicação
+        // Carrega sua aplicação Laravel
         webView.loadUrl(APP_URL)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        
-        if (requestCode == CAMERA_REQ_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permissão concedida, recarrega a página
-                webView.reload()
-            } else {
-                Toast.makeText(
-                    this, 
-                    "Permissão da câmera negada. O scanner de código não funcionará.", 
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    }
-
+    // Botão "voltar" navega no histórico do WebView
     override fun onBackPressed() {
-        if (webView.canGoBack()) {
+        if (::webView.isInitialized && webView.canGoBack()) {
             webView.goBack()
         } else {
             super.onBackPressed()
