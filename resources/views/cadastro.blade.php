@@ -5,201 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastros - Venda Fácil</title>
     <style>
-        /* CSS Reset e Estilos Globais */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        a {
-    text-decoration: none;
-    color: inherit; /* Herda a cor do elemento pai */
-}
-.top-bar {
-  background: #111;
-  color: white;
-  padding: 15px 40px;
-  flex-wrap: wrap;
-  display: flex;
-  justify-content: space-between;
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
-}
-
-.logo span {
-  background: #668a4c;
-  color: #181818;
-  padding: 2px 6px;
-  border-radius: 3px;
-  margin-left: 4px;
-}
-
-.menu {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  padding: 0;
-  margin: 0;
-}
-
-.menu li a {
-  color: rgb(250, 234, 234);
-  text-decoration: none;
-  font-size: 16px;
-}
-
-.menu li a:hover {
-  color: #7ac943;
-}
-
-.auth-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-outline {
-  background: transparent;
-  color: white;
-  border: 1px solid white;
-  padding: 5px 15px;
-  cursor: pointer;
-}
-
-.btn-solid {
-  background: #7ac943;
-  color: black;
-  border: none;
-  padding: 5px 15px;
-  cursor: pointer;
-}
 
         body {
+            font-family: 'Segoe UI', sans-serif;
             background-color: #000000;
             color: #333;
-            line-height: 1.6;
-            
         }
-        
-        /* Container Principal */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        header {
+            background-color: #1a1717;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #7ac943;
+        }
+
+        nav {
+            margin-top: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #7ac943;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #ffffff;
             padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        
-        /* Cabeçalho */
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 2.2rem;
-            border-bottom: 2px solid #7ac943;
-            padding-bottom: 10px;
-        }
-        
-        /* Seções */
+
         section {
             margin-bottom: 30px;
             padding: 20px;
             background: #f9f9f9;
             border-radius: 5px;
             border-left: 4px solid #7ac943;
+            transition: transform 0.3s ease;
         }
-        
+
+        section:hover {
+            transform: translateY(-5px);
+        }
+
         h2 {
-            color: #7ac943;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            color: #4d7c2b;
+            border-bottom: 2px solid #7ac943;
+            padding-bottom: 10px;
         }
-        
-        ul {
-            list-style-position: inside;
-            margin-bottom: 15px;
-        }
-        
-        li {
-            margin-bottom: 8px;
-        }
-        
-        /* Destaques */
-        .highlight {
-            font-weight: bold;
-            color: #e74c3c;
-            font-style: italic;
-        }
-        
-        /* Rodapé */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            color: #4a4f50;
-            font-size: 0.9rem;
-        }
-        
-        /* Botões/Links de Ação */
+
         .action-button {
             display: inline-block;
-            background: #7ac943;
+            background-color: #7ac943;
             color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s ease;
             text-decoration: none;
-            margin-top: 10px;
-            transition: background 0.3s;
+            margin-top: 15px;
         }
-        
+
         .action-button:hover {
-            background: #416e21;
+            background-color: #3b691a;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #1a1717;
+            margin-top: 40px;
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px;
+            }
+            
+            nav {
+                margin-top: 15px;
+            }
+            
+            nav a {
+                margin: 0 10px;
+                display: inline-block;
+            }
         }
     </style>
 </head>
-<header class="top-bar">
-    <div class="logo"><a href="http://localhost:8000/">Venda<span>FACIL</span></a></div>
-    <nav>
-        <ul class="menu">
-            <li><a href="http://localhost:8000/venda">Vendas</a></li>
-            <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-            <li><a href="http://localhost:8000/cliente">Clientes</a></li>
-            <li><a href="http://localhost:8000/produtos">Produtos</a></li>
-            <li><a href="http://localhost:8000/finaceiro">Financeiro</a></li>
-            
-        </ul>
-    </nav>
-   
-</header>
-
-
 <body>
-    
+    <header>
+        <h1>VendaFácil - Sistema de Cadastros</h1>
+        <nav>
+            <a href="http://localhost:8000/">Início</a>
+            <a href="http://localhost:8000/venda">Vendas</a>
+            <a href="http://localhost:8000/clientes">Clientes</a>
+            <a href="http://localhost:8000/produtos">Produtos</a>
+            <a href="http://localhost:8000/fornecedores">Fornecedores</a>
+        </nav>
+    </header>
 
-    <div class="container">
-        <h1>CADASTROS</h1>
+    <main>
+        <h2>Selecione o Tipo de Cadastro</h2>
         
         <section>
-            <h1>Clientes</h1>
-            <a href="http://localhost:8000/cadastro-clientes" class="action-button">Comece a cadastrar</a>
-            
-        </section>
-        <section>
-            <h1>Produtos</h1>
-            <a href="http://localhost:8000/cadastro-produtos" class="action-button">Comece a cadastrar</a>
-        </section>
-        <section>
-            <h1>Fornecedores</h1>
-            <a href="http://localhost:8000/cadastro-fornecedor" class="action-button">Comece a cadastrar</a>
+            <h2>Clientes</h2>
+            <p>Cadastre novos clientes no sistema para gerenciar vendas e histórico de compras.</p>
+            <a href="http://localhost:8000/cadastro-clientes" class="action-button">Cadastrar Clientes</a>
         </section>
         
-        <footer>
-            Criado por Leonardo George © 2025
-        </footer>
-    </div>
+        <section>
+            <h2>Produtos</h2>
+            <p>Adicione produtos ao seu catálogo com código de barras, preços e informações de estoque.</p>
+            <a href="http://localhost:8000/cadastro-produtos" class="action-button">Cadastrar Produtos</a>
+        </section>
+        
+        <section>
+            <h2>Fornecedores</h2>
+            <p>Registre fornecedores para manter o controle da sua cadeia de suprimentos.</p>
+            <a href="http://localhost:8000/cadastro-fornecedor" class="action-button">Cadastrar Fornecedores</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Criado por Leonardo George © 2025</p>
+    </footer>
 </body>
 </html>
