@@ -306,9 +306,10 @@
             <ul class="menu">
                 <a href="http://localhost:8000/">Início</a>
                 <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-                <li><a href="http://localhost:8000/clientes">Clientes</a></li>
+                <li><a href="http://localhost:8000/cliente">Clientes</a></li>
                 <li><a href="http://localhost:8000/produtos">Produtos</a></li>
                 <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
+                <li><a href="http://localhost:8000/fornecedores">Fornecedores</a></li>
             </ul>
         </nav>
     </header>

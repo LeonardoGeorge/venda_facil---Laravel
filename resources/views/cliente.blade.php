@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VendaFácil - Clientes</title>
+    <!-- Adicionando Font Awesome para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Reset básico */
         * {
@@ -137,6 +139,24 @@
             color: #3c763d;
             border: 1px solid #d6e9c6;
         }
+        
+        /* ===== WHATSAPP ICON ===== */
+        .whatsapp-link {
+            color: #25D366;
+            margin-left: 8px;
+            font-size: 18px;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        
+        .whatsapp-link:hover {
+            transform: scale(1.2);
+        }
+        
+        .telefone-container {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -177,7 +197,19 @@
                     <td>{{ $cliente->id }}</td>
                     <td>{{ $cliente->nome }}</td>
                     <td>{{ $cliente->email }}</td>
-                    <td>{{ $cliente->telefone }}</td>
+                    <td>
+                        <div class="telefone-container">
+                            {{ $cliente->telefone }}
+                            @if($cliente->telefone)
+                                <a href="https://wa.me/55{{ preg_replace('/[^0-9]/', '', $cliente->telefone) }}" 
+                                   target="_blank" 
+                                   class="whatsapp-link"
+                                   title="Conversar no WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            @endif
+                        </div>
+                    </td>
                     <td>{{ $cliente->endereco }}</td>
                     <td>
                         <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn-edit">Editar</a>
