@@ -19,11 +19,15 @@ use App\Http\Controllers\FornecedorController;
 |
 */
 
-// Rotas públicas
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/', function () {
+    return view('index');
+})->middleware(['auth', 'verified'])->name('home');
+
+// Rotas de autenticação (públicas)
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -32,86 +36,99 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
-// Rotas protegidas por autenticação
-Route::middleware('auth')->group(function () {
-    // Página inicial autenticada
-    Route::get('/home', function () {
-        return view('index');
-    })->name('home');
 
-    // Perfil do usuário
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Rotas protegidas
+Route::middleware('auth')->group(
+    function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ========== ROTAS DE VENDAS ==========
-    Route::prefix('vendas')->group(function () {
-        Route::get('/', [VendaController::class, 'index'])->name('vendas.index');
-        Route::post('/registrar', [VendaController::class, 'registrarVenda'])->name('vendas.registrar');
-        Route::post('/finalizar', [VendaController::class, 'finalizarVenda'])->name('vendas.finalizar');
-        Route::post('/adicionar-produto-codigo', [VendaController::class, 'adicionarProdutoPorCodigoBarras'])->name('vendas.adicionar.codigo');
+        // Adicione outras rotas protegidas aqui
+        Route::get('/venda', function () {
+            return view('venda');
+        })->name('venda');
 
-        // APIs para vendas
-        Route::get('/buscar-produto/{id}', [VendaController::class, 'buscarProduto'])->name('vendas.buscar.produto');
-        Route::get('/buscar-produto-codigo-barras/{codigoBarras}', [VendaController::class, 'buscarProdutoPorCodigoBarras'])->name('vendas.buscar.codigo');
-        Route::get('/debug-codigos', [VendaController::class, 'debugCodigosBarras'])->name('vendas.debug.codigos');
-    });
+        // Rotas para vendas
+        Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
+        Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
 
-    // ========== ROTAS DE PRODUTOS ==========
-    Route::prefix('produtos')->group(function () {
-        Route::get('/', [ProdutoController::class, 'index'])->name('produtos.index');
-        Route::get('/cadastro', [ProdutoController::class, 'create'])->name('produtos.create');
-        Route::post('/cadastro', [ProdutoController::class, 'store'])->name('produtos.store');
-        Route::get('/{id}/editar', [ProdutoController::class, 'edit'])->name('produtos.edit');
-        Route::post('/{id}/editar', [ProdutoController::class, 'update'])->name('produtos.update');
+        //Buscar prod. por Cod_barras
+        Route::get('/api/produtos/codigo-barras/{codigoBarras}', [VendaController::class, 'buscarProdutoPorCodigoBarras']);
 
-        // APIs para produtos
-        Route::get('/api/{id}', [ProdutoController::class, 'buscarProduto'])->name('produtos.api.buscar');
-        Route::get('/api/codigo-barras/{codigoBarras}', [ProdutoController::class, 'buscarPorCodigoBarras'])->name('produtos.api.codigo');
-    });
+        // Deduzir quantidado do estoque
+        Route::post('/venda/finalizar', [VendaController::class, 'finalizarVenda']);
 
-    // ========== ROTAS DE CLIENTES ==========
-    Route::prefix('clientes')->group(function () {
-        Route::get('/', [ClienteController::class, 'index'])->name('clientes.index');
-        Route::get('/cadastro', [ClienteController::class, 'create'])->name('clientes.create');
-        Route::post('/cadastro', [ClienteController::class, 'store'])->name('clientes.store');
-        Route::get('/{id}/editar', [ClienteController::class, 'edit'])->name('clientes.edit');
-        Route::post('/{id}/editar', [ClienteController::class, 'update'])->name('clientes.update');
-        Route::get('/buscar/{nome}', [ClienteController::class, 'buscarPorNome'])->name('clientes.buscar');
-    });
+        
+        // Buscar produto
+        Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 
-    // ========== ROTAS FINANCEIRO ==========
-    Route::prefix('financeiro')->group(function () {
-        Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
-        Route::get('/filtrar', [FinanceiroController::class, 'filtrar'])->name('financeiro.filtrar');
-    });
+        // Buscar produto por código de barras (ADICIONE ESTA LINHA)
+        Route::get('/api/produtos/codigo-barras/{codigoBarras}', [ProdutoController::class, 'buscarPorCodigoBarras']);
 
-    // ========== ROTAS FORNECEDORES ==========
-    Route::prefix('fornecedores')->group(function () {
-        Route::get('/', [FornecedorController::class, 'index'])->name('fornecedores.index');
-        Route::get('/cadastro', [FornecedorController::class, 'create'])->name('fornecedores.create');
-        Route::post('/cadastro', [FornecedorController::class, 'store'])->name('fornecedores.store');
-        Route::get('/{id}/editar', [FornecedorController::class, 'edit'])->name('fornecedores.edit');
-        Route::put('/{id}', [FornecedorController::class, 'update'])->name('fornecedores.update');
-        Route::delete('/{id}', [FornecedorController::class, 'destroy'])->name('fornecedores.destroy');
-    });
+        Route::get('/cadastro', function () {
+            return view('cadastro');
+        })->name('cadastro');
 
-    // Rotas de redirecionamento para compatibilidade
-    Route::get('/venda', function () {
-        return redirect()->route('vendas.index');
-    })->name('venda');
+        Route::get('/produtos', [ProdutoController::class, 'index'])->name('produtos.index');
+        Route::get('/produtos/{id}/editar', [ProdutoController::class, 'edit'])->name('produtos.edit');
+        Route::post('/produtos/{id}/editar', [ProdutoController::class, 'update'])->name('produtos.update');
+        
 
-    Route::get('/cadastro', function () {
-        return redirect()->route('produtos.index');
-    })->name('cadastro');
 
-    Route::get('/cliente', function () {
-        return redirect()->route('clientes.index');
-    })->name('cliente');
+        // Rota para MOSTRAR o formulário (GET)
+        Route::get('/cadastro-produtos', [ProdutoController::class, 'create'])
+        ->name('cadastro.produtos.form');
 
-    Route::get('/financeiro', function () {
-        return redirect()->route('financeiro.index');
-    })->name('financeiro');
-});
+        // Rota para PROCESSAR o formulário (POST)  
+        Route::post('/cadastro-produtos', [ProdutoController::class, 'store'])
+        ->name('cadastro.produtos.store');
 
-require __DIR__ . '/auth.php';
+        // Resource 
+        Route::resource('produtos', ProdutoController::class);
+
+        Route::get('/cliente', [ClienteController::class, 'index'])
+            ->name('clientes.index');
+
+        Route::get('/cadastro-clientes', [ClienteController::class, 'create'])
+            ->name('cadastro.clientes.form');
+
+        Route::post('/cadastro-clientes', [ClienteController::class, 'store'])
+            ->name('cadastro.clientes.store');
+
+        Route::get('/buscar-cliente/{nome}', [ClienteController::class, 'buscarPorNome']);
+
+        // Rotas para edição de clientes
+        Route::get('/clientes/{id}/editar', [ClienteController::class, 'edit'])
+            ->name('clientes.edit');
+
+        Route::post('/clientes/{id}/editar', [ClienteController::class, 'update'])
+            ->name('clientes.update');
+
+        Route::get('/buscar-cliente/{nome}', [ClienteController::class, 'buscarPorNome']);
+
+
+        // Financeiro 
+        Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
+
+        // Financeiro Filtrar
+        Route::get('/financeiro/filtrar', [FinanceiroController::class, 'filtrar'])->name('financeiro.filtrar');
+
+        // Rotas para fornecedores
+        Route::get('/fornecedores', [FornecedorController::class, 'index'])->name('fornecedores.index');
+        Route::get('/cadastro-fornecedores', [FornecedorController::class, 'create'])->name('fornecedores.create');
+        Route::post('/cadastro-fornecedores', [FornecedorController::class, 'store'])->name('fornecedores.store');
+        Route::get('/fornecedores/{id}/editar', [FornecedorController::class, 'edit'])->name('fornecedores.edit');
+        Route::put('/fornecedores/{id}', [FornecedorController::class, 'update'])->name('fornecedores.update');
+        Route::delete('/fornecedores/{id}', [FornecedorController::class, 'destroy'])->name('fornecedores.destroy');
+
+    
+    
+    
+    
+    }
+    
+
+);
+
+require __DIR__.'/auth.php';

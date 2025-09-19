@@ -138,10 +138,8 @@ class VendaController extends Controller
     public function finalizarVenda(Request $request)
     {
         try {
-            $vendaData = null;
-
-            DB::transaction(function () use ($request, &$vendaData) {
-                // Criar venda (usando a estrutura da sua tabela vendas)
+            DB::transaction(function () use ($request) {
+                // Criar venda
                 $venda = Venda::create([
                     'cliente' => $request->cliente ?? 'Cliente não informado',
                     'forma_pagamento' => $request->forma_pagamento,
@@ -149,45 +147,14 @@ class VendaController extends Controller
                     'data_venda' => now()
                 ]);
 
-                $vendaData = $venda;
+                // ... processar itens ...
 
-                // Percorre cada item da venda
-                foreach ($request->itens as $item) {
-                    // Calcular subtotal
-                    $subtotal = $item['quantidade'] * $item['preco'];
-
-                    // Registrar na tabela venda_produtos
-                    VendaProduto::create([
-                        'venda_id' => $venda->id,
-                        'produto_id' => $item['produto_id'],
-                        'quantidade' => $item['quantidade'],
-                        'preco_unitario' => $item['preco'],
-                        'subtotal' => $subtotal
-                    ]);
-
-                    // Atualiza estoque na tabela produtos
-                    $produto = Produto::find($item['produto_id']);
-
-                    if (!$produto) {
-                        throw new \Exception("Produto ID {$item['produto_id']} não encontrado");
-                    }
-
-                    if ($produto->quantidade < $item['quantidade']) {
-                        throw new \Exception("Estoque insuficiente para o produto {$produto->nome_produto}");
-                    }
-
-                    // 🔥 DEDUZINDO O ESTOQUE - campo 'quantidade' na tabela produtos
-                    $produto->quantidade -= $item['quantidade'];
-                    $produto->save();
-                }
+                // Imprimir DENTRO da transaction
+                $this->imprimirCupom($venda->id);
             });
 
-            // Imprimir cupom após finalizar a venda
-            $this->imprimirCupom($vendaData->id);
-
             return response()->json([
-                'mensagem' => 'Venda finalizada, estoque atualizado e cupom impresso com sucesso!',
-                'venda_id' => $vendaData->id
+                'mensagem' => 'Venda finalizada, estoque atualizado e cupom impresso com sucesso!'
             ]);
         } catch (\Exception $e) {
             return response()->json([

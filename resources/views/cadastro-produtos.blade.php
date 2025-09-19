@@ -71,28 +71,18 @@
           font-weight: bold;
         }
 
-        #camera {
-          position: relative;
-          width: 300px;
-          height: 200px;
-          border: 1px solid #ccc;
-          overflow: hidden; /* garante que não ultrapasse */
+        .leitor-container {
+          margin-bottom: 15px;
+          padding: 10px;
+          background-color: #f9f9f9;
+          border-radius: 4px;
+          border: 1px solid #ddd;
         }
 
-        #camera video {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover; /* corta e preenche */
-          position: absolute;
-          top: 0;
-          left: 0;
-        }
-        #camera canvas {
-          width: 100% !important;
-          height: 100% !important;
-          position: absolute;
-          top: 0;
-          left: 0;
+        .leitor-info {
+          font-size: 14px;
+          color: #666;
+          margin-top: 5px;
         }
 
         form input, form select {
@@ -185,12 +175,12 @@
                 <label>Nome do Produto:</label>
                 <input type="text" name="nome_produto" required>
 
-                <label for="codigo_barras">Código de Barras:</label>
-                <input type="text" id="codigo_barras" name="codigo_barras" required>
-                <div id="camera" style="width: 300px; height: 200px; border: 1px solid #ccc;"></div>
-                <br>
-                <button type="button" id="iniciarCamera">Ler Código de Barras</button>
-                <br>
+                <div class="leitor-container">
+                    <label for="codigo_barras">Código de Barras:</label>
+                    <input type="text" id="codigo_barras" name="codigo_barras" required autofocus>
+                    <p class="leitor-info">⚠️ Use um leitor físico de código de barras. Passe o código e pressione Enter.</p>
+                </div>
+
                 <label>Categoria:</label>
                 <input type="text" name="categoria" required>
 
@@ -214,44 +204,74 @@
     <footer>
         <p>Sistema VendaFácil &copy; 2023</p>
     </footer>
+
 <script>
-document.getElementById('iniciarCamera').addEventListener('click', function() {
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#camera'),
-            constraints: {
-                facingMode: "environment" // traseira no celular, webcam no PC
-            },
-        },
-        decoder: {
-            readers: ["ean_reader", "code_128_reader"] // Tipos comuns de códigos
-        },
-    }, function(err) {
-        if (err) {
-            console.log(err);
-            return;
+document.addEventListener('DOMContentLoaded', function() {
+    const codigoBarrasInput = document.getElementById('codigo_barras');
+    
+    // Focar automaticamente no campo de código de barras
+    codigoBarrasInput.focus();
+    
+    // Verificar se já existe um código de barras (para evitar dupla leitura)
+    let codigoLido = false;
+    
+    // Event listener para leitor de código de barras (tecla Enter)
+    codigoBarrasInput.addEventListener('keydown', function(e) {
+        // Se for a tecla Enter e o campo não estiver vazio
+        if (e.key === 'Enter' && this.value.trim() !== '') {
+            e.preventDefault();
+            
+            // Se já leu um código, não faz nada
+            if (codigoLido) {
+                return;
+            }
+            
+            // Verificar se é um código de barras válido (pelo menos 8 dígitos)
+            if (this.value.replace(/\D/g, '').length >= 8) {
+                codigoLido = true;
+                
+                // Buscar informações do produto se existir
+                buscarProdutoPorCodigo(this.value);
+                
+                // Opcional: avisar que o código foi lido
+                this.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 1000);
+            }
         }
-        console.log("Câmera iniciada");
-        Quagga.start();
     });
-
-    // Quando detectar código
-    Quagga.onDetected(function(result) {
-        var code = result.codeResult.code;
-        console.log("Código detectado: " + code);
-
-        // Preenche o input automaticamente
-        document.getElementById('codigo_barras').value = code;
-
-        // Para a leitura (opcional, para não ficar repetindo)
-        Quagga.stop();
+    
+    // Permitir nova leitura se o usuário alterar manualmente o código
+    codigoBarrasInput.addEventListener('input', function() {
+        codigoLido = false;
     });
+    
+    // Função para buscar produto por código de barras
+    function buscarProdutoPorCodigo(codigo) {
+        fetch(`/api/produtos/codigo-barras/${codigo}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Produto não encontrado');
+                }
+                return response.json();
+            })
+            .then(produto => {
+                // Se o produto já existe, preencher os campos automaticamente
+                document.querySelector('input[name="nome_produto"]').value = produto.nome_produto;
+                document.querySelector('input[name="categoria"]').value = produto.categoria || '';
+                document.querySelector('input[name="preco_saida"]').value = produto.preco_saida;
+                document.querySelector('input[name="quantidade"]').value = 1;
+                
+                alert('Produto encontrado! Campos preenchidos automaticamente.');
+            })
+            .catch(error => {
+                console.log('Produto não cadastrado: ' + error.message);
+                // Não faz nada se o produto não existir (é um novo produto)
+            });
+    }
 });
 </script>
-
-<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
 
 </body>
 </html>
