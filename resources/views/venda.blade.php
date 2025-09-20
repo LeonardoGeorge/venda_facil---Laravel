@@ -305,11 +305,11 @@
         <nav>
             <ul class="menu">
                 <a href="http://localhost:8000/">Início</a>
-                <li><a href="http://localhost:8000/cadastro">Cadastro</a></li>
-                <li><a href="http://localhost:8000/cliente">Clientes</a></li>
-                <li><a href="http://localhost:8000/produtos">Produtos</a></li>
-                <li><a href="http://localhost:8000/financeiro">Financeiro</a></li>
-                <li><a href="http://localhost:8000/fornecedores">Fornecedores</a></li>
+                <a href="http://localhost:8000/cadastro">Cadastro</a>
+                <a href="http://localhost:8000/cliente">Clientes</a>
+                <a href="http://localhost:8000/produtos">Produtos</a>
+                <a href="http://localhost:8000/financeiro">Financeiro</a>
+                <a href="http://localhost:8000/fornecedores">Fornecedores</a>
             </ul>
         </nav>
     </header>
@@ -335,7 +335,7 @@
                 
                 <div class="input-group">
                     <label>Quantidade</label>
-                    <input type="number" id="quantidade" value="1" min="1">
+                    <input type="number" id="quantidade" value="1" min="0.01" step="0.01">
                 </div>
                 
                 <div class="input-group">
@@ -402,8 +402,9 @@
             <button class="btn-venda" style="background: #e74c3c;" onclick="limparVenda()">CANCELAR VENDA</button>
         </section>
     </div>
+</section>
 
-<script>
+   <script>
     // Variáveis globais
     let contadorItem = 1;
     let totalVenda = 0;
@@ -412,10 +413,10 @@
     let clienteSelecionado = null;
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-    // MODIFICAÇÃO 3: Focar automaticamente no campo de código de barras
+    // Focar automaticamente no campo de código de barras
     document.getElementById('codigo_barras').focus();
 
-    // MODIFICAÇÃO 4: Leitor de código de barras físico (tecla Enter)
+    // Leitor de código de barras físico (tecla Enter)
     document.getElementById('codigo_barras').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -517,7 +518,7 @@
             document.getElementById('codigo').value = produto.codigo || produto.id || '';
             atualizarValorTotal();
             
-            // MODIFICAÇÃO 5: Focar na quantidade após ler código de barras
+            // Focar na quantidade após ler código de barras
             document.getElementById('quantidade').focus();
             document.getElementById('quantidade').select();
         } else {
@@ -561,8 +562,13 @@
             return;
         }
 
-        // Deduzir do banco imediatamente
-        await atualizarEstoque(produto.id, quantidade);
+        // Deduzir do banco imediatamente - COM TRATAMENTO DE ERRO
+        try {
+            await atualizarEstoque(produto.id, quantidade);
+        } catch (error) {
+            alert("Erro ao atualizar estoque: " + error.message);
+            return; // Não adiciona o item se falhar
+        }
 
         // Adicionar produto à lista
         produtosSelecionados.push({
@@ -593,7 +599,7 @@
         document.getElementById('valorUnitario').value = '0,00';
         document.getElementById('valorTotal').value = '';
         
-        // MODIFICAÇÃO 6: Voltar o foco para o leitor de código de barras
+        // Voltar o foco para o leitor de código de barras
         document.getElementById('codigo_barras').focus();
     }
 
@@ -628,60 +634,62 @@
         document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
     }
 
-    // MODIFICAÇÃO 7: Nova função para finalizar venda com impressão
-async function finalizarVendaComImpressao() {
-    if (produtosSelecionados.length === 0) {
-        alert("Adicione pelo menos um produto!");
-        return;
-    }
-
-    // Mostrar caixa de confirmação personalizada
-const imprimirNota = await mostrarConfirmacaoImpressao();
-if (imprimirNota === null) return; // Usuário fechou a janela
-    
-    if (imprimirNota === null) return; // Usuário cancelou
-    
-    const cliente = document.getElementById('cliente').value.trim();
-    const formaPagamento = document.getElementById('formaPagamento').value;
-
-    try {
-        const response = await fetch('/vendas/finalizar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({
-                cliente: cliente,
-                cliente_id: clienteSelecionado,
-                forma_pagamento: formaPagamento,
-                total: totalVenda,
-                imprimir_nota: imprimirNota, // Adiciona flag para impressão
-                itens: produtosSelecionados.map(item => ({
-                    produto_id: item.id,
-                    quantidade: item.quantidade,
-                    preco: item.preco_unitario
-                }))
-            })
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            if (imprimirNota) {
-                alert('Venda registrada, estoque atualizado e cupom impresso com sucesso!');
-            } else {
-                alert('Venda finalizada com sucesso!');
-            }
-            limparVenda();
-        } else {
-            alert('Erro: ' + result.mensagem);
+    // Nova função para finalizar venda com impressão
+    async function finalizarVendaComImpressao() {
+        if (produtosSelecionados.length === 0) {
+            alert("Adicione pelo menos um produto!");
+            return;
         }
-    } catch (error) {
-        console.error('Erro ao finalizar venda:', error);
-        alert('Erro ao finalizar venda!');
+
+        // Mostrar caixa de confirmação
+        const imprimirNota = confirm("Deseja imprimir a nota fiscal?");
+        
+        if (imprimirNota === null) return; // Usuário cancelou
+        
+        const cliente = document.getElementById('cliente').value.trim();
+        const formaPagamento = document.getElementById('formaPagamento').value;
+
+        try {
+            const response = await fetch('/vendas/finalizar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    cliente: cliente,
+                    cliente_id: clienteSelecionado,
+                    forma_pagamento: formaPagamento,
+                    total: totalVenda,
+                    imprimir_nota: imprimirNota,
+                    itens: produtosSelecionados.map(item => ({
+                        produto_id: item.id,
+                        quantidade: item.quantidade,
+                        preco: item.preco_unitario
+                    }))
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                if (imprimirNota) {
+                    // Abrir janela de impressão em vez de alert
+                    imprimirNotaFiscal();
+                    alert('Venda registrada e estoque atualizado com sucesso!');
+                } else {
+                    alert('Venda finalizada com sucesso!');
+                }
+                limparVenda();
+            } else {
+                alert('Erro: ' + result.mensagem);
+            }
+        } catch (error) {
+            console.error('Erro ao finalizar venda:', error);
+            alert('Erro ao finalizar venda!');
+        }
     }
-}
+
     // Limpar venda
     function limparVenda() {
         contadorItem = 1;
@@ -703,59 +711,125 @@ if (imprimirNota === null) return; // Usuário fechou a janela
         document.getElementById('valorUnitario').value = '0,00';
         document.getElementById('valorTotal').value = '';
         
-        // MODIFICAÇÃO 8: Focar no leitor de código de barras após limpar
+        // Focar no leitor de código de barras após limpar
         document.getElementById('codigo_barras').focus();
     }
-    // Função para mostrar caixa de confirmação personalizada
-function mostrarConfirmacaoImpressao() {
-    return new Promise((resolve) => {
-        // Criar overlay
-        const overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        overlay.style.display = 'flex';
-        overlay.style.justifyContent = 'center';
-        overlay.style.alignItems = 'center';
-        overlay.style.zIndex = '1000';
+
+    // Função para imprimir nota fiscal em tela
+    function imprimirNotaFiscal() {
+        // Criar um elemento temporário para a impressão
+        const conteudoImpressao = document.createElement('div');
+        conteudoImpressao.style.fontFamily = 'monospace';
+        conteudoImpressao.style.padding = '20px';
+        conteudoImpressao.style.fontSize = '14px';
+        conteudoImpressao.style.lineHeight = '1.4';
         
-        // Criar caixa de diálogo
-        const dialog = document.createElement('div');
-        dialog.style.backgroundColor = 'white';
-        dialog.style.padding = '20px';
-        dialog.style.borderRadius = '8px';
-        dialog.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-        dialog.style.textAlign = 'center';
-        dialog.style.width = '300px';
+        // Obter data e hora atual
+        const agora = new Date();
+        const dataHora = agora.toLocaleString('pt-BR');
         
-        // Adicionar conteúdo
-        dialog.innerHTML = `
-            <h3 style="margin-top: 0; color: #2c3e50;">Imprimir Nota Fiscal?</h3>
-            <div style="margin: 20px 0;">
-                <button id="btnSim" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px; cursor: pointer;">Sim</button>
-                <button id="btnNao" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Não</button>
+        // Construir conteúdo da nota fiscal
+        let html = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">VENDA FÁCIL</h2>
+                <p style="margin: 5px 0;">Sistema de Gestão Comercial</p>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <p><strong>Data/Hora:</strong> ${dataHora}</p>
+                <p><strong>Cliente:</strong> ${document.getElementById('cliente').value || 'Consumidor'}</p>
+                <p><strong>Pagamento:</strong> ${document.getElementById('formaPagamento').value}</p>
+            </div>
+            
+            <hr style="border-top: 1px dashed #000; margin: 15px 0;">
+            
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; border-bottom: 1px solid #000;">Item</th>
+                        <th style="text-align: left; border-bottom: 1px solid #000;">Descrição</th>
+                        <th style="text-align: right; border-bottom: 1px solid #000;">Qtd</th>
+                        <th style="text-align: right; border-bottom: 1px solid #000;">Unitário</th>
+                        <th style="text-align: right; border-bottom: 1px solid #000;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        // Adicionar itens
+        produtosSelecionados.forEach((item, index) => {
+            html += `
+                <tr>
+                    <td style="padding: 4px 0;">${index + 1}</td>
+                    <td style="padding: 4px 0;">${item.nome}</td>
+                    <td style="text-align: right; padding: 4px 0;">${item.quantidade}</td>
+                    <td style="text-align: right; padding: 4px 0;">R$ ${formatarNumero(item.preco_unitario)}</td>
+                    <td style="text-align: right; padding: 4px 0;">R$ ${formatarNumero(item.quantidade * item.preco_unitario)}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+            
+            <hr style="border-top: 1px dashed #000; margin: 15px 0;">
+            
+            <div style="text-align: right; font-weight: bold; font-size: 16px;">
+                Total: R$ ${formatarNumero(totalVenda)}
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <p>Obrigado pela preferência!</p>
+                <p>Volte sempre!</p>
             </div>
         `;
         
-        // Adicionar ao DOM
-        overlay.appendChild(dialog);
-        document.body.appendChild(overlay);
+        conteudoImpressao.innerHTML = html;
         
-        // Configurar eventos
-        document.getElementById('btnSim').addEventListener('click', () => {
-            document.body.removeChild(overlay);
-            resolve(true);
-        });
+        // Abrir janela de impressão
+        const janelaImpressao = window.open('', '_blank', 'width=800,height=600');
+        janelaImpressao.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Nota Fiscal - Venda Fácil</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        color: #000; 
+                    }
+                    @media print {
+                        body { 
+                            margin: 0; 
+                            padding: 15px; 
+                        }
+                        .no-print { 
+                            display: none !important; 
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="no-print" style="margin-bottom: 20px; text-align: center;">
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Imprimir Nota Fiscal
+                    </button>
+                    <button onclick="window.close()" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                        Fechar
+                    </button>
+                </div>
+                ${conteudoImpressao.innerHTML}
+            </body>
+            </html>
+        `);
+        janelaImpressao.document.close();
         
-        document.getElementById('btnNao').addEventListener('click', () => {
-            document.body.removeChild(overlay);
-            resolve(false);
-        });
-    });
-}
+        // Focar na janela de impressão
+        janelaImpressao.focus();
+    }
 
     // Event Listeners para Enter
     ['codigo', 'codigo_barras', 'quantidade', 'valorUnitario'].forEach(id => {
@@ -796,14 +870,26 @@ function mostrarConfirmacaoImpressao() {
                 })
             });
 
+            // Verificar se a resposta é JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                // Se não for JSON, ler como texto para debug
+                const textResponse = await response.text();
+                console.error("Resposta não-JSON do servidor:", textResponse.substring(0, 200));
+                throw new Error('Resposta do servidor não é JSON. Possível erro de rota ou servidor.');
+            }
+
             const result = await response.json();
 
             if(!response.ok) {
-                console.error("Erro ao atualizar estoque:", result.mensagem || result);
-                alert("Não foi possível atualizar o estoque deste item.");
+                console.error("Erro ao atualizar estoque:", result.erro || result.mensagem);
+                throw new Error(result.erro || "Erro ao atualizar estoque");
             }
+            
+            return result;
         } catch (error) {
             console.error("Erro ao conectar API de estoque:", error);
+            throw error; // Propagar o erro para ser tratado por quem chama
         }
     }
 </script>

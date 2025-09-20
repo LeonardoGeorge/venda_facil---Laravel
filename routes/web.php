@@ -48,18 +48,20 @@ Route::middleware('auth')->group(
         Route::get('/venda', function () {
             return view('venda');
         })->name('venda');
+        // Adicione esta rota no grupo de rotas protegidas
+        Route::get('/venda/{id}/imprimir', [VendaController::class, 'imprimirNotaFiscal'])->name('venda.imprimir');
 
         // Rotas para vendas
         Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
         Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
 
-        //Buscar prod. por Cod_barras
-        Route::get('/api/produtos/codigo-barras/{codigoBarras}', [VendaController::class, 'buscarProdutoPorCodigoBarras']);
+        
 
         // Deduzir quantidado do estoque
-        Route::post('/venda/finalizar', [VendaController::class, 'finalizarVenda']);
+        Route::post('/vendas/finalizar', [VendaController::class, 'finalizarVenda']);
 
-        
+        Route::post('/api/produtos/deduzir-estoque', [ProdutoController::class, 'deduzirEstoque']);
+
         // Buscar produto
         Route::get('/api/produtos/{id}', [ProdutoController::class, 'buscarProduto']);
 

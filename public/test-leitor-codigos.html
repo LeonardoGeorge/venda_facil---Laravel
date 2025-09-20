@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Leitor de Código de Barras - {{ config('app.name') }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .description {
+            color: #555;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4a86e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 134, 232, 0.2);
+        }
+
+        small {
+            color: #777;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .test-area {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .test-area h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .test-btn {
+            padding: 12px 20px;
+            background-color: #4a86e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .test-btn:hover {
+            background-color: #3a76d8;
+        }
+
+        .status {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .scanner-animation {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #4a86e8, transparent);
+            background-size: 200% 100%;
+            animation: scan 2s linear infinite;
+            margin-top: 10px;
+            border-radius: 2px;
+            display: none;
+        }
+
+        @keyframes scan {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            border-left: 4px solid #4a86e8;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #4a86e8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Teste de Leitor de Código de Barras</h1>
+        <p class="description">Esta ferramenta ajuda você a verificar se o leitor de código de barras está funcionando
+            corretamente.</p>
+
+        <div class="input-group">
+            <label>Leitor de Código de Barras Físico</label>
+            <input type="text" id="codigo_barras" placeholder="Passe o código de barras" autofocus>
+            <small>⚠️ Use um leitor físico. Passe o código e pressione Enter.</small>
+            <div class="scanner-animation" id="scanner-animation"></div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="test-area">
+            <h3>Teste Simulado (sem leitor físico)</h3>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="simulateScan('7891000315507')">Simular Leitor 1</button>
+                <button class="test-btn" onclick="simulateScan('7891910000197')">Simular Leitor 2</button>
+                <button class="test-btn" onclick="simulateScan('7896036093291')">Simular Leitor 3</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>Como verificar se o leitor está funcionando:</h3>
+            <ul>
+                <li>Pressione as teclas de teste acima para simular a leitura de um código de barras</li>
+                <li>Se os campos ficarem verdes, significa que o sistema está funcionando</li>
+                <li>Se você tem um leitor físico, aproxime e escaneie um código de barras real</li>
+                <li>Observe se o código aparece no campo de entrada e o status é atualizado</li>
+                <li>Verifique se o leitor está em modo de interface de teclado (HID)</li>
+                <li>Teste pressionando "Enter" após a leitura para verificar o comportamento completo</li>
+            </ul>
+        </div>
+
+        <a href="/" class="back-btn">← Voltar para o sistema</a>
+    </div>
+
+    <script>
+        const codigoBarrasInput = document.getElementById('codigo_barras');
+        const statusDiv = document.getElementById('status');
+        const scannerAnimation = document.getElementById('scanner-animation');
+
+        // Mostrar animação quando o campo receber foco
+        codigoBarrasInput.addEventListener('focus', () => {
+            scannerAnimation.style.display = 'block';
+        });
+
+        // Ocultar animação quando o campo perder o foco
+        codigoBarrasInput.addEventListener('blur', () => {
+            scannerAnimation.style.display = 'none';
+        });
+
+        // Detectar quando um código é inserido (pelo leitor ou manualmente)
+        codigoBarrasInput.addEventListener('input', () => {
+            if (codigoBarrasInput.value.length > 0) {
+                showStatus('Código detectado: ' + codigoBarrasInput.value, 'success');
+            }
+        });
+
+        // Detectar quando a tecla Enter é pressionada
+        codigoBarrasInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (codigoBarrasInput.value.length > 0) {
+                    showStatus('Leitura concluída com sucesso! Código: ' + codigoBarrasInput.value, 'success');
+
+                    // Limpar o campo após 2 segundos
+                    setTimeout(() => {
+                        codigoBarrasInput.value = '';
+                        statusDiv.style.display = 'none';
+                    }, 2000);
+                } else {
+                    showStatus('Erro: Nenhum código foi lido.', 'error');
+                }
+            }
+        });
+
+        // Função para simular a leitura de um código de barras
+        function simulateScan(barcode) {
+            // Mostrar animação de leitura
+            scannerAnimation.style.display = 'block';
+
+            // Simular o tempo de leitura
+            setTimeout(() => {
+                codigoBarrasInput.value = barcode;
+
+                // Disparar evento de input
+                const event = new Event('input', { bubbles: true });
+                codigoBarrasInput.dispatchEvent(event);
+
+                // Mostrar mensagem de sucesso
+                showStatus('Leitura simulada bem-sucedida! Código: ' + barcode, 'success');
+
+                // Ocultar animação após um tempo
+                setTimeout(() => {
+                    scannerAnimation.style.display = 'none';
+
+                    // Limpar após alguns segundos
+                    setTimeout(() => {
+                        codigoBarrasInput.value = '';
+                        statusDiv.style.display = 'none';
+                    }, 2000);
+                }, 1000);
+            }, 800);
+        }
+
+        // Função para mostrar o status
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

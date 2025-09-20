@@ -102,5 +102,38 @@ class ProdutoController extends Controller
         ]);
     }
 
+    public function deduzirEstoque(Request $request)
+    {
+        try {
+            $request->validate([
+                'produto_id' => 'required|integer',
+                'quantidade' => 'required|numeric|min:0.01' // Alterado para numeric e min:0.01
+            ]);
+
+            $produto = Produto::find($request->produto_id);
+
+            if (!$produto) {
+                return response()->json(['erro' => 'Produto não encontrado'], 404);
+            }
+
+            // Converta para float para garantir precisão
+            $quantidade = (float) $request->quantidade;
+
+            if ($produto->quantidade < $quantidade) {
+                return response()->json(['erro' => 'Estoque insuficiente'], 400);
+            }
+
+            $produto->quantidade -= $quantidade;
+            $produto->save();
+
+            return response()->json([
+                'mensagem' => 'Estoque atualizado com sucesso',
+                'novo_estoque' => $produto->quantidade
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['erro' => 'Erro ao atualizar estoque: ' . $e->getMessage()], 500);
+        }
+    }
+
     
 }

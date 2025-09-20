@@ -77,6 +77,7 @@
           background-color: #f9f9f9;
           border-radius: 4px;
           border: 1px solid #ddd;
+          position: relative;
         }
 
         .leitor-info {
@@ -118,6 +119,106 @@
           color: #aaa;
         }
 
+        /* Novos estilos para o leitor */
+        .scanner-animation {
+          width: 100%;
+          height: 4px;
+          background: linear-gradient(90deg, transparent, #4a86e8, transparent);
+          background-size: 200% 100%;
+          animation: scan 2s linear infinite;
+          margin-top: 10px;
+          border-radius: 2px;
+          display: none;
+        }
+
+        @keyframes scan {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+
+        .leitor-status {
+          text-align: center;
+          padding: 8px;
+          margin-top: 10px;
+          font-weight: 600;
+          border-radius: 4px;
+          background-color: #f8f9fa;
+          border: 1px solid #ddd;
+          font-size: 14px;
+        }
+
+        .leitor-conectado {
+          background-color: #d4edda;
+          color: #155724;
+          border-color: #c3e6cb;
+        }
+
+        .leitor-aguardando {
+          background-color: #fff3cd;
+          color: #856404;
+          border-color: #ffeeba;
+        }
+
+        .leitor-erro {
+          background-color: #f8d7da;
+          color: #721c24;
+          border-color: #f5c6cb;
+        }
+
+        .test-area {
+          margin-top: 20px;
+          padding: 15px;
+          background-color: #f0f7ff;
+          border-radius: 8px;
+          border-left: 4px solid #4a86e8;
+        }
+
+        .test-buttons {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+          flex-wrap: wrap;
+        }
+
+        .test-btn {
+          padding: 8px 12px;
+          background-color: #4a86e8;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .test-btn:hover {
+          background-color: #3a76d8;
+        }
+
+        .status-message {
+          margin-top: 10px;
+          padding: 10px;
+          border-radius: 4px;
+          text-align: center;
+          display: none;
+          font-weight: 600;
+        }
+
+        .status-success {
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        }
+
         @media (max-width: 768px) {
           main {
             margin: 20px;
@@ -137,6 +238,10 @@
           nav a {
             margin: 0 10px;
             display: inline-block;
+          }
+
+          .test-buttons {
+            flex-direction: column;
           }
         }
     </style>
@@ -178,7 +283,9 @@
                 <div class="leitor-container">
                     <label for="codigo_barras">Código de Barras:</label>
                     <input type="text" id="codigo_barras" name="codigo_barras" required autofocus>
+                    <div class="scanner-animation" id="scanner-animation"></div>
                     <p class="leitor-info">⚠️ Use um leitor físico de código de barras. Passe o código e pressione Enter.</p>
+                    <div class="leitor-status" id="leitor-status">Status: Aguardando leitura...</div>
                 </div>
 
                 <label>Categoria:</label>
@@ -198,6 +305,20 @@
 
                 <button type="submit">Cadastrar Produto</button>
             </form>
+
+            <!-- Área de teste para o leitor -->
+            <div class="test-area">
+                <h3>Teste do Leitor de Código de Barras</h3>
+                <p>Teste se o leitor está funcionando corretamente:</p>
+                
+                <div class="test-buttons">
+                    <button class="test-btn" onclick="simularLeitura('7891000315507')">Simular Leitor 1</button>
+                    <button class="test-btn" onclick="simularLeitura('7891910000197')">Simular Leitor 2</button>
+                    <button class="test-btn" onclick="simularLeitura('7896036093291')">Simular Leitor 3</button>
+                </div>
+                
+                <div class="status-message" id="status-message"></div>
+            </div>
         </section>
     </main>
 
@@ -208,12 +329,29 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const codigoBarrasInput = document.getElementById('codigo_barras');
+    const scannerAnimation = document.getElementById('scanner-animation');
+    const leitorStatus = document.getElementById('leitor-status');
+    const statusMessage = document.getElementById('status-message');
     
     // Focar automaticamente no campo de código de barras
     codigoBarrasInput.focus();
     
     // Verificar se já existe um código de barras (para evitar dupla leitura)
     let codigoLido = false;
+    
+    // Mostrar animação quando o campo receber foco
+    codigoBarrasInput.addEventListener('focus', () => {
+        scannerAnimation.style.display = 'block';
+        leitorStatus.textContent = "Status: Pronto para leitura (campo em foco)";
+        leitorStatus.className = "leitor-status leitor-conectado";
+    });
+    
+    // Ocultar animação quando o campo perder o foco
+    codigoBarrasInput.addEventListener('blur', () => {
+        scannerAnimation.style.display = 'none';
+        leitorStatus.textContent = "Status: Aguardando foco no campo";
+        leitorStatus.className = "leitor-status leitor-aguardando";
+    });
     
     // Event listener para leitor de código de barras (tecla Enter)
     codigoBarrasInput.addEventListener('keydown', function(e) {
@@ -230,21 +368,40 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.value.replace(/\D/g, '').length >= 8) {
                 codigoLido = true;
                 
+                // Atualizar status
+                leitorStatus.textContent = "Status: Leitura bem-sucedida!";
+                leitorStatus.className = "leitor-status leitor-conectado";
+                
+                // Mostrar mensagem de sucesso
+                mostrarStatus('Código lido com sucesso: ' + this.value, 'success');
+                
                 // Buscar informações do produto se existir
                 buscarProdutoPorCodigo(this.value);
                 
-                // Opcional: avisar que o código foi lido
+                // Destacar visualmente o campo
                 this.style.backgroundColor = '#e8f5e8';
                 setTimeout(() => {
                     this.style.backgroundColor = '';
                 }, 1000);
+            } else {
+                mostrarStatus('Erro: Código de barras inválido. Deve ter pelo menos 8 dígitos.', 'error');
+                leitorStatus.textContent = "Status: Erro na leitura";
+                leitorStatus.className = "leitor-status leitor-erro";
             }
         }
     });
     
-    // Permitir nova leitura se o usuário alterar manualmente o código
+    // Detectar quando um código é inserido (pelo leitor ou manualmente)
     codigoBarrasInput.addEventListener('input', function() {
         codigoLido = false;
+        
+        if (this.value.length > 0) {
+            leitorStatus.textContent = "Status: Código detectado - pressione Enter";
+            leitorStatus.className = "leitor-status leitor-conectado";
+        } else {
+            leitorStatus.textContent = "Status: Aguardando leitura";
+            leitorStatus.className = "leitor-status leitor-aguardando";
+        }
     });
     
     // Função para buscar produto por código de barras
@@ -263,13 +420,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('input[name="preco_saida"]').value = produto.preco_saida;
                 document.querySelector('input[name="quantidade"]').value = 1;
                 
-                alert('Produto encontrado! Campos preenchidos automaticamente.');
+                mostrarStatus('Produto encontrado! Campos preenchidos automaticamente.', 'success');
             })
             .catch(error => {
                 console.log('Produto não cadastrado: ' + error.message);
                 // Não faz nada se o produto não existir (é um novo produto)
             });
     }
+    
+    // Função para mostrar mensagens de status
+    function mostrarStatus(mensagem, tipo) {
+        statusMessage.textContent = mensagem;
+        statusMessage.className = `status-message status-${tipo}`;
+        statusMessage.style.display = 'block';
+        
+        // Ocultar a mensagem após 3 segundos
+        setTimeout(() => {
+            statusMessage.style.display = 'none';
+        }, 3000);
+    }
+    
+    // Função para simular leitura (usada pelos botões de teste)
+    window.simularLeitura = function(codigo) {
+        // Mostrar animação de leitura
+        scannerAnimation.style.display = 'block';
+        leitorStatus.textContent = "Status: Simulando leitura...";
+        leitorStatus.className = "leitor-status leitor-conectado";
+        
+        // Simular o tempo de leitura
+        setTimeout(() => {
+            codigoBarrasInput.value = codigo;
+            
+            // Disparar evento de input
+            const event = new Event('input', { bubbles: true });
+            codigoBarrasInput.dispatchEvent(event);
+            
+            // Mostrar mensagem de sucesso
+            mostrarStatus('Leitura simulada bem-sucedida! Código: ' + codigo, 'success');
+            
+            // Simular pressionar Enter após a leitura
+            setTimeout(() => {
+                const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+                codigoBarrasInput.dispatchEvent(enterEvent);
+                
+                // Ocultar animação após um tempo
+                setTimeout(() => {
+                    scannerAnimation.style.display = 'none';
+                }, 500);
+            }, 300);
+        }, 800);
+    };
 });
 </script>
 

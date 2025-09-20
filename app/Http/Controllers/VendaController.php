@@ -8,9 +8,6 @@ use App\Models\Produto;
 use App\Models\VendaProduto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
-use Mike42\Escpos\Printer;
 
 class VendaController extends Controller
 {
@@ -134,12 +131,13 @@ class VendaController extends Controller
         }
     }
 
-    // Finalizar e deduzir estoque no bd + IMPRESSÃO
     public function finalizarVenda(Request $request)
-    {
+{
         try {
-            DB::transaction(function () use ($request) {
-                // Criar venda
+            $vendaData = null; // Inicializa a variável
+
+            DB::transaction(function () use ($request, &$vendaData) { // Note o & antes de $vendaData
+                // Criar venda (usando a estrutura da sua tabela vendas)
                 $venda = Venda::create([
                     'cliente' => $request->cliente ?? 'Cliente não informado',
                     'forma_pagamento' => $request->forma_pagamento,
@@ -147,74 +145,72 @@ class VendaController extends Controller
                     'data_venda' => now()
                 ]);
 
-                // ... processar itens ...
+                $vendaData = $venda; // Atribui o valor à variável por referência
 
-                // Imprimir DENTRO da transaction
-                $this->imprimirCupom($venda->id);
-            });
+                foreach ($request->itens as $item) {
+                // Converta para float
+                $quantidade = (float) $item['quantidade'];
+                $preco = (float) $item['preco'];
+                
+                $subtotal = $quantidade * $preco;
 
-            return response()->json([
-                'mensagem' => 'Venda finalizada, estoque atualizado e cupom impresso com sucesso!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'mensagem' => 'Erro ao finalizar venda: ' . $e->getMessage()
-            ], 500);
-        }
+                VendaProduto::create([
+                    'venda_id' => $venda->id,
+                    'produto_id' => $item['produto_id'],
+                    'quantidade' => $quantidade, // Use a variável convertida
+                    'preco_unitario' => $preco,  // Use a variável convertida
+                    'subtotal' => $subtotal
+                ]);
+
+                $produto = Produto::find($item['produto_id']);
+
+                if (!$produto) {
+                    throw new \Exception("Produto ID {$item['produto_id']} não encontrado");
+                }
+
+                // Use a variável convertida
+                if ($produto->quantidade < $quantidade) {
+                    throw new \Exception("Estoque insuficiente para: {$produto->nome_produto}");
+                }
+
+                $produto->quantidade -= $quantidade;
+                $produto->save();
+            }
+        });
+
+        // ... resto do código ...
+    } catch (\Exception $e) {
+        Log::error("Erro ao finalizar venda: " . $e->getMessage());
+        return response()->json([
+            'mensagem' => 'Erro ao finalizar venda: ' . $e->getMessage(),
+            'success' => false
+        ], 500);
     }
+}
 
-    // Função para imprimir cupom fiscal
-    private function imprimirCupom($vendaId)
+    // Adicione este novo método para impressão
+    public function imprimirNotaFiscal($id)
     {
         try {
-            $venda = Venda::with(['itens.produto'])->find($vendaId);
+            $venda = Venda::with(['itens.produto'])->find($id);
 
             if (!$venda) {
-                throw new \Exception("Venda não encontrada");
+                return response()->json(['erro' => 'Venda não encontrada'], 404);
             }
 
-            // Configuração da impressora - ajuste conforme necessário
-            $nomeImpressora = "XP-80"; // Nome da impressora configurada no Windows
-            $connector = new WindowsPrintConnector($nomeImpressora);
-            $printer = new Printer($connector);
-
-            // Iniciar impressão
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("==============================\n");
-            $printer->text("        VENDA FÁCIL\n");
-            $printer->text("==============================\n");
-            $printer->setJustification(Printer::JUSTIFY_LEFT);
-
-            $printer->text("Data: " . $venda->data_venda->format('d/m/Y H:i') . "\n");
-            $printer->text("Venda: #" . str_pad($venda->id, 6, '0', STR_PAD_LEFT) . "\n");
-            $printer->text("Cliente: " . $venda->cliente . "\n");
-            $printer->text("-------------------------------\n");
-
-            // Itens da venda
-            foreach ($venda->itens as $item) {
-                $printer->text($item->produto->nome_produto . "\n");
-                $printer->text($item->quantidade . " x R$ " . number_format($item->preco_unitario, 2, ',', '.') . " = R$ " . number_format($item->subtotal, 2, ',', '.') . "\n");
-            }
-
-            $printer->text("-------------------------------\n");
-            $printer->setJustification(Printer::JUSTIFY_RIGHT);
-            $printer->text("TOTAL: R$ " . number_format($venda->valor_total, 2, ',', '.') . "\n");
-            $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text("Forma de Pagamento: " . $venda->forma_pagamento . "\n");
-            $printer->text("==============================\n");
-            $printer->text("Obrigado pela preferência!\n");
-            $printer->text("Volte sempre!\n");
-
-            // Cortar papel (se a impressora suportar)
-            $printer->cut();
-
-            $printer->close();
-
-            return true;
+            return response()->json([
+                'venda' => $venda,
+                'itens' => $venda->itens->map(function ($item) {
+                    return [
+                        'nome' => $item->produto->nome_produto,
+                        'quantidade' => $item->quantidade,
+                        'preco_unitario' => $item->preco_unitario,
+                        'subtotal' => $item->subtotal
+                    ];
+                })
+            ]);
         } catch (\Exception $e) {
-            Log::error("Erro ao imprimir cupom: " . $e->getMessage());
-            // Não falha a venda se houver erro na impressão
-            return false;
+            return response()->json(['erro' => 'Erro ao buscar dados da venda: ' . $e->getMessage()], 500);
         }
     }
 
@@ -226,5 +222,31 @@ class VendaController extends Controller
             ->get(['id', 'nome_produto', 'codigo_barras']);
 
         return response()->json($produtosComCodigo);
+    }
+
+    // Novo método para obter dados da venda para impressão (opcional)
+    public function obterDadosVenda($id)
+    {
+        try {
+            $venda = Venda::with(['itens.produto'])->find($id);
+
+            if (!$venda) {
+                return response()->json(['erro' => 'Venda não encontrada'], 404);
+            }
+
+            return response()->json([
+                'venda' => $venda,
+                'itens' => $venda->itens->map(function ($item) {
+                    return [
+                        'nome' => $item->produto->nome_produto,
+                        'quantidade' => $item->quantidade,
+                        'preco_unitario' => $item->preco_unitario,
+                        'subtotal' => $item->subtotal
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['erro' => 'Erro ao buscar dados da venda: ' . $e->getMessage()], 500);
+        }
     }
 }
