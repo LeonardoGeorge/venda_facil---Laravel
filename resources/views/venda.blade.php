@@ -430,7 +430,7 @@
             </div>
             
             <!-- MODIFICAÇÃO 3: Alterado para apenas "FINALIZAR VENDA" -->
-            <button class="btn-venda" onclick="finalizarVenda()">FINALIZAR VENDA</button>
+            <button type="button" class="btn-venda" onclick="finalizarVenda()">FINALIZAR VENDA</button>
             <button class="btn-venda" style="background: #e74c3c;" onclick="limparVenda()">CANCELAR VENDA</button>
         </section>
     </div>

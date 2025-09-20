@@ -61,8 +61,6 @@ Route::middleware('auth')->group(
 
 
         // Deduzir quantidado do estoque
-        Route::post('/vendas/finalizar', [VendaController::class, 'finalizarVenda']);
-
         Route::post('/api/produtos/deduzir-estoque', [ProdutoController::class, 'deduzirEstoque']);
 
         // Buscar produto

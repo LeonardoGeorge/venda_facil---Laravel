@@ -72,45 +72,65 @@ class VendaController extends Controller
      * Finalizar a venda: deduz estoque e confirma
      */
     public function finalizarVenda(Request $request)
-    {
-        $request->validate([
-            'venda_id' => 'required|integer',
+{
+    $request->validate([
+        'cliente_id' => 'nullable|integer',
+        'forma_pagamento' => 'required|string',
+        'total' => 'required|numeric|min:0',
+        'itens' => 'required|array',
+        'itens.*.produto_id' => 'required|integer',
+        'itens.*.quantidade' => 'required|integer|min:1',
+        'itens.*.preco' => 'required|numeric|min:0',
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        // Criar a venda
+        $venda = Venda::create([
+            'cliente_id' => $request->cliente_id,
+            'forma_pagamento' => $request->forma_pagamento,
+            'total' => $request->total,
+            'finalizada' => true,
         ]);
 
-        try {
-            DB::beginTransaction();
+        foreach ($request->itens as $item) {
+            $produto = Produto::findOrFail($item['produto_id']);
 
-            $venda = Venda::with('itens.produto')->findOrFail($request->venda_id);
-
-            foreach ($venda->itens as $item) {
-                $produto = $item->produto;
-
-                if ($produto->quantidade < $item->quantidade) {
-                    throw new \Exception("Estoque insuficiente para o produto {$produto->nome}");
-                }
-
-                $produto->quantidade -= $item->quantidade;
-                $produto->save();
+            if ($produto->quantidade < $item['quantidade']) {
+                throw new \Exception("Estoque insuficiente para o produto {$produto->nome}");
             }
 
-            $venda->update(['finalizada' => true]);
+            // Deduzir estoque
+            $produto->quantidade -= $item['quantidade'];
+            $produto->save();
 
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Venda finalizada e estoque atualizado!',
+            // Criar item da venda
+            VendaItem::create([
+                'venda_id' => $venda->id,
+                'produto_id' => $item['produto_id'],
+                'quantidade' => $item['quantidade'],
+                'preco' => $item['preco'],
             ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error("Erro ao finalizar venda: " . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao finalizar venda: ' . $e->getMessage(),
-            ], 500);
         }
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Venda registrada e finalizada com sucesso!',
+            'venda_id' => $venda->id,
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error("Erro ao finalizar venda: " . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao finalizar venda: ' . $e->getMessage(),
+        ], 500);
     }
+}
 
     /**
      * Imprimir nota fiscal (simples)
