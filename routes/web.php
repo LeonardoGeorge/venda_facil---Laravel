@@ -54,7 +54,7 @@ Route::middleware('auth')->group(
         // Rotas para vendas
         Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
         Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
-        Route::post('/vendas/finalizar', [VendaController::class, 'finalizarVenda'])->name('venda.finalizar');
+        Route::post('/finalizar-venda', [VendaController::class, 'finalizarVenda'])->name('venda.finalizar');
         Route::get('/venda/{id}/imprimir', [VendaController::class, 'imprimirNotaFiscal'])->name('venda.imprimir');
 
 
@@ -112,6 +112,7 @@ Route::middleware('auth')->group(
 
 
         // Financeiro 
+        Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
         Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
 
         // Financeiro Filtrar

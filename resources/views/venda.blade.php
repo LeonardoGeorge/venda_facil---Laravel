@@ -667,52 +667,59 @@
 
     // Função para finalizar venda (sem impressão automática)
 async function finalizarVenda() {
-    if (produtosSelecionados.length === 0) {
-        alert("Adicione pelo menos um produto!");
+    const formaPagamento = document.getElementById('formaPagamento').value;
+    
+    if (!formaPagamento) {
+        alert('Selecione a forma de pagamento!');
         return;
     }
 
-    const cliente = document.getElementById('cliente').value.trim();
-    const formaPagamento = document.getElementById('formaPagamento').value;
+    if (produtosSelecionados.length === 0) {
+        alert('Adicione produtos à venda!');
+        return;
+    }
+
+    const dadosVenda = {
+        cliente_id: clienteSelecionado || null,
+        forma_pagamento: formaPagamento,
+        total: totalVenda,
+        itens: produtosSelecionados.map(produto => ({
+            produto_id: produto.id,
+            quantidade: produto.quantidade,
+            preco: produto.preco
+        }))
+    };
 
     try {
-        const response = await fetch('/vendas/finalizar', {
+        const response = await fetch('{{ route("venda.finalizar") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({
-                cliente: cliente,
-                cliente_id: clienteSelecionado,
-                forma_pagamento: formaPagamento,
-                total: totalVenda,
-                itens: produtosSelecionados.map(item => ({
-                    produto_id: item.id,
-                    quantidade: item.quantidade,
-                    preco: item.preco_unitario
-                }))
-            })
+            body: JSON.stringify(dadosVenda)
         });
+
+        // Verificar se a resposta é JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Resposta do servidor não é JSON');
+        }
 
         const result = await response.json();
 
-        // VERIFICAR SE DEU CERTO PRIMEIRO!
         if (result.success) {
-            alert('Venda registrada e estoque atualizado com sucesso!');
+            alert('Venda registrada com sucesso!');
             limparVenda();
-            
-            // Redirecionar para o financeiro APENAS se sucesso
-            window.location.href = 'http://localhost:8000/financeiro';
+            window.location.href = '{{ route("financeiro") }}';
         } else {
-            // Se falhou, mostrar erro específico
-            alert('Erro: ' + (result.message || 'Falha ao finalizar venda'));
-            console.error('Erro detalhado:', result);
+            alert('Erro: ' + result.message);
         }
 
     } catch (error) {
-        alert('Erro ao finalizar venda. Tente novamente.');
-        console.error('Erro de rede:', error);
+        console.error('Erro completo:', error);
+        alert('Erro ao conectar com o servidor. Verifique o console para detalhes.');
     }
 }
 
