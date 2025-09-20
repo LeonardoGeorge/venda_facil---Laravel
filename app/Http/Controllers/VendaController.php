@@ -36,9 +36,13 @@ class VendaController extends Controller
         try {
             DB::beginTransaction();
 
+            // No VendaController::finalizarVenda()
             $venda = Venda::create([
-                'cliente_id' => $request->cliente_id,
-                'total' => collect($request->itens)->sum(fn($i) => $i['quantidade'] * $i['preco']),
+                'cliente' => $request->cliente, // Usar o nome do cliente
+                'forma_pagamento' => $request->forma_pagamento,
+                'valor_total' => $request->total,
+                'data_venda' => now(),
+                
             ]);
 
             foreach ($request->itens as $item) {

@@ -697,15 +697,22 @@ async function finalizarVenda() {
 
         const result = await response.json();
 
-        alert('Venda registrada e estoque atualizado com sucesso!');
-        limparVenda();
-
-        // Redirecionar para o financeiro
-        window.location.href = 'http://localhost:8000/financeiro';
+        // VERIFICAR SE DEU CERTO PRIMEIRO!
+        if (result.success) {
+            alert('Venda registrada e estoque atualizado com sucesso!');
+            limparVenda();
+            
+            // Redirecionar para o financeiro APENAS se sucesso
+            window.location.href = 'http://localhost:8000/financeiro';
+        } else {
+            // Se falhou, mostrar erro específico
+            alert('Erro: ' + (result.message || 'Falha ao finalizar venda'));
+            console.error('Erro detalhado:', result);
+        }
 
     } catch (error) {
         alert('Erro ao finalizar venda. Tente novamente.');
-        console.error(error);
+        console.error('Erro de rede:', error);
     }
 }
 

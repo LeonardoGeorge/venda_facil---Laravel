@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('vendas', function (Blueprint $table) {
             $table->id();
-            $table->string('cliente');
+            $table->foreignId('cliente_id')->nullable()->constrained()->onDelete('set null');
             $table->string('forma_pagamento');
-            $table->decimal('valor_total', 10, 2);
-            $table->timestamp('data_venda')->useCurrent();
+            $table->decimal('total', 10, 2);
+            $table->boolean('finalizada')->default(false);
             $table->timestamps();
         });
     }
