@@ -10,7 +10,7 @@ class Venda extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cliente_id',
+        'cliente_id',       // ← DEVE estar presente
         'forma_pagamento',
         'total',
         'finalizada'
