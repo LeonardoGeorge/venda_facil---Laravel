@@ -18,7 +18,8 @@ class Produto extends Model
     ];
     protected $casts = [
         'preco' => 'decimal:2',
-        'estoque' => 'integer',
+        'quantidade' => 'decimal:3',
+        'estoque' => 'decimal:3',
         'ativo' => 'boolean'
     ];
 

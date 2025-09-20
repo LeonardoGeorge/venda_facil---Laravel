@@ -76,14 +76,14 @@ class VendaController extends Controller
      */
     public function finalizarVenda(Request $request)
     {
-        // Validação dos dados
+        // Validação dos dados - permitir quantidades decimais
         $validated = $request->validate([
             'cliente_id' => 'nullable|integer|exists:clientes,id',
             'forma_pagamento' => 'required|string|max:50',
             'total' => 'required|numeric|min:0',
             'itens' => 'required|array|min:1',
             'itens.*.produto_id' => 'required|integer|exists:produtos,id',
-            'itens.*.quantidade' => 'required|integer|min:1',
+            'itens.*.quantidade' => 'required|numeric|min:0.01', // Alterado para numeric e mínimo 0.01
             'itens.*.preco' => 'required|numeric|min:0',
         ]);
 
@@ -103,13 +103,14 @@ class VendaController extends Controller
             foreach ($validated['itens'] as $item) {
                 $produto = Produto::findOrFail($item['produto_id']);
 
-                // Verificar estoque
+                // Verificar estoque - considerar quantidades decimais
                 if ($produto->quantidade < $item['quantidade']) {
-                    throw new \Exception("Estoque insuficiente para o produto: {$produto->nome}");
+                    throw new \Exception("Estoque insuficiente para o produto: {$produto->nome}. Disponível: {$produto->quantidade}, Solicitado: {$item['quantidade']}");
                 }
 
-                // Atualizar estoque
-                $produto->decrement('quantidade', $item['quantidade']);
+                // Atualizar estoque - usar decrement com valor decimal
+                $produto->quantidade = $produto->quantidade - $item['quantidade'];
+                $produto->save();
 
                 // Criar item da venda
                 VendaItem::create([
@@ -136,6 +137,19 @@ class VendaController extends Controller
                 'message' => 'Erro ao processar venda: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!$request->ajax() && !$request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Apenas requisições JSON são permitidas'
+                ], 400);
+            }
+            return $next($request);
+        })->only(['finalizarVenda']);
     }
 
     /**

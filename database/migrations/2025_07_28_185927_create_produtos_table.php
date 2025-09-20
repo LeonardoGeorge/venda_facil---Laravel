@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('categoria');
             $table->decimal('preco_entrada', 10, 2);
             $table->decimal('preco_saida', 10, 2);
-            $table->integer('quantidade');
+            $table->decimal('quantidade');
             $table->string('fornecedor')->nullable();
             $table->timestamps();
         });

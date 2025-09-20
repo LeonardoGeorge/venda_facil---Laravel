@@ -13,8 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('venda_items', function (Blueprint $table) {
+        Schema::create('venda_itens', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('venda_id')->constrained()->onDelete('cascade');
+            $table->foreignId('produto_id')->constrained();
+            $table->decimal('quantidade', 8, 3); // 8 dígitos no total, 3 casas decimais
+            $table->decimal('preco', 10, 2);
+            $table->decimal('subtotal', 10, 2);
             $table->timestamps();
         });
     }

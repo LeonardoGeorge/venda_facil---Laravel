@@ -679,16 +679,19 @@ async function finalizarVenda() {
         return;
     }
 
+    // Converter tipos numéricos - manter decimais para quantidade
     const dadosVenda = {
-        cliente_id: clienteSelecionado || null,
+        cliente_id: clienteSelecionado ? parseInt(clienteSelecionado) : null,
         forma_pagamento: formaPagamento,
-        total: totalVenda,
+        total: parseFloat(totalVenda),
         itens: produtosSelecionados.map(produto => ({
-            produto_id: produto.id,
-            quantidade: produto.quantidade,
-            preco: produto.preco
+            produto_id: parseInt(produto.id),
+            quantidade: parseFloat(produto.quantidade), // Manter como float para decimais
+            preco: parseFloat(produto.preco)
         }))
     };
+
+    console.log('Dados enviados:', dadosVenda); // Para debug
 
     try {
         const response = await fetch('{{ route("venda.finalizar") }}', {
@@ -701,9 +704,10 @@ async function finalizarVenda() {
             body: JSON.stringify(dadosVenda)
         });
 
-        // Verificar se a resposta é JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
+            const errorText = await response.text();
+            console.error('Resposta não-JSON:', errorText);
             throw new Error('Resposta do servidor não é JSON');
         }
 

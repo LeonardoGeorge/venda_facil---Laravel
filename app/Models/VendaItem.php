@@ -14,6 +14,13 @@ class VendaItem extends Model
         'produto_id',
         'quantidade',
         'preco',
+        'subtotal'
+    ];
+
+    protected $casts = [
+        'quantidade' => 'decimal:3', // Cast para decimal com 3 casas
+        'preco' => 'decimal:2',
+        'subtotal' => 'decimal:2'
     ];
 
     public function venda()
