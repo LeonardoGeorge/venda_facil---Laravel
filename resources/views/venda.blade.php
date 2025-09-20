@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sistema de Vendas - Supermercado</title>
     <style>
-    body {
+    body { 
         margin: 0;
         font-family: 'Segoe UI', sans-serif;
         background-color: #f5f7f9;
@@ -198,6 +198,10 @@
         background-color: #219653;
     }
 
+    .nota {
+        position: relative;
+    }
+
     .nota pre {
         background: #f9f9f9;
         padding: 15px;
@@ -208,6 +212,27 @@
         white-space: pre-wrap;
         border-radius: 8px;
         line-height: 1.5;
+    }
+
+    .print-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #3498db;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.3s;
+        z-index: 10;
+    }
+
+    .print-icon:hover {
+        background: #2980b9;
     }
 
     .totais {
@@ -353,6 +378,13 @@
 
             <section class="right-panel">
                 <div class="nota">
+                    <!-- MODIFICAÇÃO 2: Adicionado ícone de impressora -->
+                    <div class="print-icon" onclick="imprimirNotaFiscal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                            <path d="M6 14h12v8H6z"/>
+                        </svg>
+                    </div>
                     <pre id="notaFiscal"><strong>ITEM  CÓDIGO     DESCRIÇÃO               VL.UNIT.  ITENS(R$)</strong></pre>
                 </div>
 
@@ -397,12 +429,11 @@
                 </select>
             </div>
             
-            <!-- MODIFICAÇÃO 2: Alterado para chamar finalizarVendaComImpressao -->
-            <button class="btn-venda" onclick="finalizarVendaComImpressao()">FINALIZAR VENDA</button>
+            <!-- MODIFICAÇÃO 3: Alterado para apenas "FINALIZAR VENDA" -->
+            <button class="btn-venda" onclick="finalizarVenda()">FINALIZAR VENDA</button>
             <button class="btn-venda" style="background: #e74c3c;" onclick="limparVenda()">CANCELAR VENDA</button>
         </section>
     </div>
-</section>
 
    <script>
     // Variáveis globais
@@ -634,61 +665,50 @@
         document.getElementById('troco').value = troco >= 0 ? formatarNumero(troco) : '0,00';
     }
 
-    // Nova função para finalizar venda com impressão
-    async function finalizarVendaComImpressao() {
-        if (produtosSelecionados.length === 0) {
-            alert("Adicione pelo menos um produto!");
-            return;
-        }
-
-        // Mostrar caixa de confirmação
-        const imprimirNota = confirm("Deseja imprimir a nota fiscal?");
-        
-        if (imprimirNota === null) return; // Usuário cancelou
-        
-        const cliente = document.getElementById('cliente').value.trim();
-        const formaPagamento = document.getElementById('formaPagamento').value;
-
-        try {
-            const response = await fetch('/vendas/finalizar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    cliente: cliente,
-                    cliente_id: clienteSelecionado,
-                    forma_pagamento: formaPagamento,
-                    total: totalVenda,
-                    imprimir_nota: imprimirNota,
-                    itens: produtosSelecionados.map(item => ({
-                        produto_id: item.id,
-                        quantidade: item.quantidade,
-                        preco: item.preco_unitario
-                    }))
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                if (imprimirNota) {
-                    // Abrir janela de impressão em vez de alert
-                    imprimirNotaFiscal();
-                    alert('Venda registrada e estoque atualizado com sucesso!');
-                } else {
-                    alert('Venda finalizada com sucesso!');
-                }
-                limparVenda();
-            } else {
-                alert('Erro: ' + result.mensagem);
-            }
-        } catch (error) {
-            console.error('Erro ao finalizar venda:', error);
-            alert('Erro ao finalizar venda!');
-        }
+    // Função para finalizar venda (sem impressão automática)
+async function finalizarVenda() {
+    if (produtosSelecionados.length === 0) {
+        alert("Adicione pelo menos um produto!");
+        return;
     }
+
+    const cliente = document.getElementById('cliente').value.trim();
+    const formaPagamento = document.getElementById('formaPagamento').value;
+
+    try {
+        const response = await fetch('/vendas/finalizar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                cliente: cliente,
+                cliente_id: clienteSelecionado,
+                forma_pagamento: formaPagamento,
+                total: totalVenda,
+                itens: produtosSelecionados.map(item => ({
+                    produto_id: item.id,
+                    quantidade: item.quantidade,
+                    preco: item.preco_unitario
+                }))
+            })
+        });
+
+        const result = await response.json();
+
+        alert('Venda registrada e estoque atualizado com sucesso!');
+        limparVenda();
+
+        // Redirecionar para o financeiro
+        window.location.href = 'http://localhost:8000/financeiro';
+
+    } catch (error) {
+        alert('Erro ao finalizar venda. Tente novamente.');
+        console.error(error);
+    }
+}
+
 
     // Limpar venda
     function limparVenda() {
@@ -715,8 +735,13 @@
         document.getElementById('codigo_barras').focus();
     }
 
-    // Função para imprimir nota fiscal em tela
+    // MODIFICAÇÃO 2: Função para imprimir nota fiscal (chamada pelo ícone)
     function imprimirNotaFiscal() {
+        if (produtosSelecionados.length === 0) {
+            alert("Não há itens na nota fiscal para imprimir!");
+            return;
+        }
+
         // Criar um elemento temporário para a impressão
         const conteudoImpressao = document.createElement('div');
         conteudoImpressao.style.fontFamily = 'monospace';

@@ -10,26 +10,18 @@ class Venda extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cliente',
-        'forma_pagamento',
-        'valor_total',
-        'data_venda'
+        'cliente_id',
+        'total',
+        'finalizada'
     ];
-
-    protected $casts = [
-        'valor_total' => 'decimal:2',
-        'data_venda' => 'datetime'
-    ];
-
-    public function produtos()
-    {
-        return $this->belongsToMany(Produto::class, 'venda_produtos')
-            ->withPivot('quantidade', 'preco_unitario', 'subtotal')
-            ->withTimestamps();
-    }
 
     public function itens()
     {
-        return $this->hasMany(VendaProduto::class);
+        return $this->hasMany(VendaItem::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 }

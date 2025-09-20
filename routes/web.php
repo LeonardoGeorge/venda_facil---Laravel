@@ -54,8 +54,11 @@ Route::middleware('auth')->group(
         // Rotas para vendas
         Route::get('/venda', [VendaController::class, 'index'])->name('venda.index');
         Route::post('/venda/registrar', [VendaController::class, 'registrarVenda'])->name('venda.registrar');
+        Route::post('/vendas/finalizar', [VendaController::class, 'finalizarVenda'])->name('venda.finalizar');
+        Route::get('/venda/{id}/imprimir', [VendaController::class, 'imprimirNotaFiscal'])->name('venda.imprimir');
 
-        
+
+
 
         // Deduzir quantidado do estoque
         Route::post('/vendas/finalizar', [VendaController::class, 'finalizarVenda']);
