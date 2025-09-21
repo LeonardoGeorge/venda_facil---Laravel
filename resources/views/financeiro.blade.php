@@ -175,7 +175,7 @@
                 <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>
                 <td>{{ $venda->name_cliente ?? 'Cliente não informado' }}</td>
                 <td>{{ ucfirst($venda->forma_pagamento) }}</td>
-                <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($venda->total, 2, ',', '.') }}</td>
                 <td>Concluído</td>
             </tr>
             @endforeach
@@ -222,14 +222,14 @@ function filtrarFinanceiro() {
                 totalVendas++;
                 
                 tbody.innerHTML += `
-                    <tr>
-                        <td>${new Date(venda.data_venda).toLocaleDateString('pt-BR')}</td>
-                        <td>${venda.cliente ?? '-'}</td>
-                        <td>${venda.forma_pagamento ?? '-'}</td>
-                        <td>R$ ${valorVenda.toFixed(2).replace('.', ',')}</td>
-                        <td>Concluído</td>
-                    </tr>
-                `;
+                <tr>
+                    <td>${new Date(venda.data_venda).toLocaleDateString('pt-BR')}</td>
+                    <td>${venda.name_cliente ?? 'Cliente não informado'}</td> <!-- Alterado aqui -->
+                    <td>${venda.forma_pagamento ?? '-'}</td>
+                    <td>R$ ${valorVenda.toFixed(2).replace('.', ',')}</td>
+                    <td>Concluído</td>
+                </tr>
+            `;
             });
             
             // Calcular média diária
@@ -249,9 +249,19 @@ function filtrarFinanceiro() {
                 'R$ ' + mediaDiaria.toFixed(2).replace('.', ',');
             document.getElementById('totalVendas').textContent = totalVendas;
         })
-        .catch(error => {
-            console.error('Erro ao filtrar dados:', error);
-        });
+         .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // ... código existente
+    })
+    .catch(error => {
+        console.error('Erro ao filtrar dados:', error);
+        alert('Erro ao carregar dados financeiros. Verifique o console para mais detalhes.');
+    });
 }
 
 // Inicializar campos de data com valores padrão
@@ -273,6 +283,7 @@ function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
+
 </script>
 
 

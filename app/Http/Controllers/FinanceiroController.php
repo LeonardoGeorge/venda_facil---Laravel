@@ -13,55 +13,45 @@ class FinanceiroController extends Controller
     {
         $hoje = now()->toDateString();
 
-        // Resumo diário - CORRIGIDO
-        $totalDiario = DB::table('vendas')
-            ->whereDate('created_at', $hoje) // ← data_venda → created_at
-            ->sum('total'); // ← valor_total → total
-
-        // Resumo semanal - CORRIGIDO
-        $inicioSemana = now()->startOfWeek();
-        $fimSemana = now()->endOfWeek();
-        $totalSemanal = DB::table('vendas')
-            ->whereBetween('created_at', [$inicioSemana, $fimSemana]) // ← data_venda → created_at
-            ->sum('total'); // ← valor_total → total
-
-        // Resumo mensal - CORRIGIDO
-        $inicioMes = now()->startOfMonth();
-        $fimMes = now()->endOfMonth();
-        $totalMensal = DB::table('vendas')
-            ->whereBetween('created_at', [$inicioMes, $fimMes]) // ← data_venda → created_at
-            ->sum('total'); // ← valor_total → total
-
-        // Lista de vendas (últimos 50 registros) - CORRIGIDO
+        // Use o mesmo campo em todos os lugares - escolha entre created_at ou data_venda
         $vendas = DB::table('vendas')
-            ->orderBy('created_at', 'desc') // ← data_venda → created_at
+            ->leftJoin('clientes', 'vendas.cliente_id', '=', 'clientes.id')
+            ->select(
+                'vendas.*',
+                'clientes.nome as name_cliente',
+                'vendas.total as valor_total' // ← ALIAS para compatibilidade
+            )
+            ->orderBy('vendas.created_at', 'desc')
             ->limit(50)
             ->get();
 
-        return view('financeiro', compact('totalDiario', 'totalSemanal', 'totalMensal', 'vendas'));
+        return view('financeiro', compact('vendas'));
     }
 
     public function filtrar(Request $request)
     {
-        $query = DB::table('vendas');
+        $query = DB::table('vendas')
+            ->leftJoin('clientes', 'vendas.cliente_id', '=', 'clientes.id')
+            ->select(
+                'vendas.*',
+                'clientes.nome as name_cliente', 
+                 'vendas.total as valor_total'
+            );
 
-        // Filtro por data - CORRIGIDO
+        // Filtro por data
         if ($request->filled('inicio') && $request->filled('fim')) {
             $inicio = Carbon::parse($request->inicio)->startOfDay();
             $fim = Carbon::parse($request->fim)->endOfDay();
-            $query->whereBetween('created_at', [$inicio, $fim]); // ← data_venda → created_at
+            $query->whereBetween('vendas.created_at', [$inicio, $fim]);
         }
 
-        // Filtro por cliente - CORRIGIDO (se você tiver tabela de clientes)
+        // Filtro por cliente
         if ($request->filled('cliente')) {
-            // Se você tem relação com clientes, precisa fazer join
-            $query->where('cliente_id', $request->cliente); // ← cliente → cliente_id
+            $query->where('clientes.nome', 'like', '%' . $request->cliente . '%');
         }
 
-        // Ordenação - CORRIGIDO
-        $vendas = $query->orderBy('created_at', 'desc')->get(); // ← data_venda → created_at
+        $vendas = $query->orderBy('vendas.created_at', 'desc')->get();
 
-        // Retorna JSON para AJAX
         return response()->json($vendas);
     }
 }

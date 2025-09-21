@@ -113,7 +113,7 @@ Route::middleware('auth')->group(
 
         // Financeiro 
         Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
-        Route::get('/financeiro', [FinanceiroController::class, 'index'])->name('financeiro');
+        
 
         // Financeiro Filtrar
         Route::get('/financeiro/filtrar', [FinanceiroController::class, 'filtrar'])->name('financeiro.filtrar');
