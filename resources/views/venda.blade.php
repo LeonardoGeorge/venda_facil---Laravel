@@ -681,13 +681,13 @@ async function finalizarVenda() {
 
     // Converter tipos numéricos - manter decimais para quantidade
     const dadosVenda = {
-        cliente_id: clienteSelecionado ? parseInt(clienteSelecionado) : null,
+        cliente_id: null,
         forma_pagamento: formaPagamento,
         total: parseFloat(totalVenda),
         itens: produtosSelecionados.map(produto => ({
             produto_id: parseInt(produto.id),
             quantidade: parseFloat(produto.quantidade), // Manter como float para decimais
-            preco: parseFloat(produto.preco)
+            preco: parseFloat(produto.preco) || 0
         }))
     };
 

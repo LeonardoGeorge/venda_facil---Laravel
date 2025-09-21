@@ -171,13 +171,13 @@
          <!-- Preenchido via backend ou JS -->
         <tbody id="tabelaFinanceiro">
             @foreach($vendas as $venda)
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>                                      
-                    <td>{{ $venda->cliente }}</td>                    
-                    <td>{{ ucfirst($venda->forma_pagamento) }}</td>                    
-                    <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>                    
-                    <td>Concluído</td>
-                </tr>
+            <tr>
+                <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>
+                <td>{{ $venda->name_cliente ?? 'Cliente não informado' }}</td>
+                <td>{{ ucfirst($venda->forma_pagamento) }}</td>
+                <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
+                <td>Concluído</td>
+            </tr>
             @endforeach
         </tbody>
     </table>
@@ -202,8 +202,13 @@ function filtrarFinanceiro() {
     const url = `/api/financeiro?inicio=${inicio}&fim=${fim}&cliente=${cliente}`;
 
     fetch(url)
-        .then(response => response.json())
+        .then(response => response.ok ? response.json() : [])
         .then(data => {
+            // fallback caso a API não retorne nada
+            if (!Array.isArray(data)) {
+                data = [];
+            }
+
             const tbody = document.getElementById('tabelaFinanceiro');
             tbody.innerHTML = '';
             
@@ -219,8 +224,8 @@ function filtrarFinanceiro() {
                 tbody.innerHTML += `
                     <tr>
                         <td>${new Date(venda.data_venda).toLocaleDateString('pt-BR')}</td>
-                        <td>${venda.cliente}</td>
-                        <td>${venda.forma_pagamento}</td>
+                        <td>${venda.cliente ?? '-'}</td>
+                        <td>${venda.forma_pagamento ?? '-'}</td>
                         <td>R$ ${valorVenda.toFixed(2).replace('.', ',')}</td>
                         <td>Concluído</td>
                     </tr>
@@ -269,6 +274,7 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 </script>
+
 
 </body>
 </html>
